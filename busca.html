@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frota WS Receptivo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;color:#1a1a1a;background:#f4f6f9;min-height:100vh}
+header{background:#1A3A5C;color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px}
+header h1{font-size:16px;font-weight:600}
+header span{font-size:12px;opacity:.7;margin-left:auto}
+.container{padding:16px 20px;max-width:1100px;margin:0 auto}
+
+/* KPIs */
+.kpis{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.kpi{background:#fff;border-radius:8px;padding:10px 16px;flex:1;min-width:110px;border:.5px solid #dde3ec}
+.kpi-label{font-size:11px;color:#666;margin-bottom:3px}
+.kpi-val{font-size:22px;font-weight:600;color:#1A3A5C}
+
+/* busca */
+.search-row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.search-wrap{position:relative;flex:1}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#999;pointer-events:none}
+.search-wrap input{width:100%;padding:9px 12px 9px 34px;font-size:14px;border:.5px solid #ccc;border-radius:8px;background:#fff;outline:none;transition:border .15s}
+.search-wrap input:focus{border-color:#2a6099;box-shadow:0 0 0 2px rgba(42,96,153,.12)}
+.btn-clear{padding:8px 14px;border-radius:8px;border:.5px solid #ccc;background:#fff;color:#666;font-size:13px;cursor:pointer}
+.btn-clear:hover{border-color:#999;color:#333}
+
+/* chips */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:.5px solid #ccc;background:#fff;color:#555;font-size:12px;cursor:pointer;transition:all .15s;user-select:none}
+.chip:hover{border-color:#2a6099;color:#2a6099}
+.chip.active{background:#1A3A5C;border-color:#1A3A5C;color:#fff}
+.chip svg{flex-shrink:0}
+
+/* tabela */
+.card{background:#fff;border-radius:10px;border:.5px solid #dde3ec;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#1A3A5C;color:#fff;font-weight:500;padding:9px 11px;text-align:left;font-size:11px;letter-spacing:.04em;white-space:nowrap}
+td{padding:7px 11px;border-bottom:.5px solid #eef0f3;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f7f9fc}
+.frota-num{font-weight:700;color:#1A3A5C}
+.placa{font-family:monospace;font-size:12px;background:#eef0f3;padding:2px 6px;border-radius:4px;letter-spacing:.07em}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.b-rod{background:#dae3f3;color:#1A3A5C}
+.b-micro{background:#e2efda;color:#1B5E20}
+.b-van{background:#fce4d6;color:#7F3F00}
+.b-car{background:#f2f2f2;color:#444}
+.b-cam{background:#f3e4f6;color:#6A1B9A}
+.b-antt{background:#e6f4ea;color:#1B5E20;font-weight:600}
+.motor-tag{color:#555;font-size:12px}
+.dim{color:#888;font-size:12px}
+
+
+.footer{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:12px;color:#888}
+.no-results{text-align:center;padding:2.5rem;color:#999;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M1 10h22M5 19v2M19 19v2"/><circle cx="7" cy="15" r="1" fill="white"/><circle cx="17" cy="15" r="1" fill="white"/></svg>
+  <h1>Frota WS Receptivo</h1>
+  <span>65 veículos · Maceió – AL</span>
+</header>
+
+<div class="container">
+
+  <div class="kpis" id="kpis">
+    <div class="kpi"><div class="kpi-label">Total</div><div class="kpi-val" id="k-total">65</div></div>
+    <div class="kpi"><div class="kpi-label">Rodoviários</div><div class="kpi-val" style="color:#1A3A5C" id="k-rod">—</div></div>
+    <div class="kpi"><div class="kpi-label">Micro-ônibus</div><div class="kpi-val" style="color:#1B5E20" id="k-micro">—</div></div>
+    <div class="kpi"><div class="kpi-label">Vans</div><div class="kpi-val" style="color:#7F3F00" id="k-van">—</div></div>
+    <div class="kpi"><div class="kpi-label">Carros</div><div class="kpi-val" style="color:#444" id="k-car">—</div></div>
+    
+  </div>
+
+  <div class="search-row">
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="q" type="text" placeholder="Buscar por frota, placa, modelo ou motor…" oninput="render()">
+    </div>
+    <button class="btn-clear" onclick="clearSearch()">Limpar</button>
+  </div>
+
+  <div class="chips">
+    <button class="chip active" data-cat="" onclick="setCat(this,'')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Todos
+    </button>
+    <button class="chip" data-cat="Ônibus rodoviário" onclick="setCat(this,'Ônibus rodoviário')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M1 10h22M5 19v2M19 19v2"/><circle cx="7" cy="15" r="1" fill="currentColor"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+      Rodoviário
+    </button>
+    <button class="chip" data-cat="Micro-ônibus" onclick="setCat(this,'Micro-ônibus')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M2 11h20M6 19v2M18 19v2"/><circle cx="7" cy="14" r="1" fill="currentColor"/><circle cx="17" cy="14" r="1" fill="currentColor"/></svg>
+      Micro-ônibus
+    </button>
+    <button class="chip" data-cat="Van" onclick="setCat(this,'Van')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 10L5 5h13l5 5v6H1z"/><path d="M1 16h22"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>
+      Van
+    </button>
+    <button class="chip" data-cat="Carro / utilitário" onclick="setCat(this,'Carro / utilitário')">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12L6 7h12l3 5v4H3z"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>
+      Carro
+    </button>
+    
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr>
+        <th>Frota</th>
+        <th>Placa</th>
+        <th>Modelo</th>
+        <th>Categoria</th>
+        <th>Motor</th>
+        <th>CV</th>
+        <th>Cap.</th>
+        <th>Empresa</th>
+        <th>ANTT</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <span id="count"></span>
+    <span>Fonte: CRLV Detran-AL • WS Receptivo 2026</span>
+  </div>
+
+</div>
+
+<script>
+const FROTA=[
+  {f:'701',p:'QLA2804',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,emp:'W2S',antt:false,alerta:false},
+  {f:'702',p:'QLA3654',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,emp:'W2S',antt:false,alerta:false},
+  {f:'703',p:'TNQ7G21',m:'Toyota Hiace DX Pass',cat:'Van',mot:'Toyota 1GD-FTV',cv:148,cap:15,emp:'S2',antt:true,alerta:false},
+  {f:'704',p:'QLM0046',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
+  {f:'706',p:'NMI9338',m:'Volare W9 ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:26,emp:'W2S',antt:true,alerta:false},
+  {f:'707',p:'NML2278',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 904 LA',cv:150,cap:26,emp:'S2',antt:false,alerta:false},
+  {f:'708',p:'NMA4755',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:42,emp:'S2',antt:false,alerta:false},
+  {f:'709',p:'QLL9886',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
+  {f:'710',p:'NMI0278',m:'Volare W9 ON',cat:'Micro-ônibus',mot:'MWM 4.12 TCE',cv:150,cap:26,emp:'S2',antt:false,alerta:false},
+  {f:'711',p:'NLZ5794',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,emp:'S2',antt:false,alerta:false},
+  {f:'712',p:'NLZ5824',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,emp:'S2',antt:false,alerta:false},
+  {f:'713',p:'SAD3F04',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,emp:'W2S',antt:false,alerta:false},
+  {f:'714',p:'SAD2D24',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,emp:'W2S',antt:false,alerta:false},
+  {f:'715',p:'QLM0136',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
+  {f:'716',p:'MUN7648',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,emp:'S2',antt:false,alerta:false},
+  {f:'717A',p:'OHB6701',m:'MB/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:47,emp:'S2',antt:false,alerta:false},
+  {f:'717B',p:'TNT0I72',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'718A',p:'OHC5201',m:'MB/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:47,emp:'S2',antt:false,alerta:false},
+  {f:'718B',p:'TNT0I62',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'719',p:'NMD2991',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:360,cap:52,emp:'S2',antt:false,alerta:false},
+  {f:'720',p:'QWH1694',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,emp:'S2',antt:false,alerta:false},
+  {f:'722',p:'QWH1654',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,emp:'W2S',antt:false,alerta:false},
+  {f:'723',p:'QWH1684',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,emp:'W2S',antt:false,alerta:false},
+  {f:'725',p:'OHH2647',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,emp:'S2',antt:false,alerta:false},
+  {f:'727',p:'ORI2153',m:'VW/Voyage TL MCV',cat:'Carro / utilitário',mot:'VW EA211 1.0 MPI',cv:82,cap:5,emp:'S2',antt:false,alerta:false},
+  {f:'728',p:'SAA9F61',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:381,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'729',p:'SAA0D22',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'S2',antt:false,alerta:false},
+  {f:'730',p:'OHG5463',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:42,emp:'S2',antt:true,alerta:false},
+  {f:'731',p:'SAF9F70',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,emp:'S2',antt:false,alerta:false},
+  {f:'732',p:'QLD4730',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:45,emp:'S2',antt:false,alerta:false},
+  {f:'733',p:'QLA3664',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,emp:'S2',antt:false,alerta:false},
+  {f:'734',p:'SAB8H95',m:'Hyundai HB20S',cat:'Carro / utilitário',mot:'Hyundai Kappa 1.0',cv:80,cap:5,emp:'S2',antt:false,alerta:false},
+  {f:'735',p:'QLL9846',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
+  {f:'736',p:'QLE6489',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:false,alerta:false},
+  {f:'737',p:'QLE6499',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:false,alerta:false},
+  {f:'738',p:'QLG6648',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'739',p:'QLG6688',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'740',p:'QWG4207',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'S2',antt:false,alerta:false},
+  {f:'741',p:'QLH4597',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,emp:'W2S',antt:false,alerta:false},
+  {f:'742',p:'QLF3186',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,emp:'S2',antt:false,alerta:false},
+  {f:'743',p:'QLF3296',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,emp:'S2',antt:false,alerta:false},
+  {f:'744',p:'QLJ4866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
+  {f:'745',p:'QLL9866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
+  {f:'746',p:'QLL8530',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,emp:'W2S',antt:false,alerta:false},
+  {f:'747',p:'QLM2981',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,emp:'W2S',antt:false,alerta:false},
+  {f:'748',p:'QLI9485',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'749',p:'QLJ5397',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:30,emp:'S2',antt:true,alerta:false},
+  {f:'750',p:'QLI9475',m:'MB/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:354,cap:50,emp:'S2',antt:true,alerta:false},
+  {f:'751',p:'QTT4691',m:'Scania/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:400,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'752',p:'QWG3260',m:'Scania/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:360,cap:48,emp:'S2',antt:true,alerta:false},
+  {f:'753',p:'QWG4177',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'W2S',antt:false,alerta:false},
+  {f:'754',p:'QWG4187',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'W2S',antt:false,alerta:false},
+  {f:'755',p:'SAI5H68',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,emp:'S2',antt:false,alerta:false},
+  {f:'756',p:'SAI1D18',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,emp:'S2',antt:false,alerta:false},
+  {f:'757',p:'TNJ1J49',m:'Volare V8L MO',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:157,cap:19,emp:'S2',antt:false,alerta:false},
+  {f:'758',p:'MUI6F52',m:'Ford Transit 410 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:165,cap:15,emp:'S2',antt:false,alerta:false},
+  {f:'Caminhão',p:'ORE2H18',m:'VW 15.190 CRM 4X2',cat:'Caminhão',mot:'MAN D0834',cv:186,cap:3,emp:'S2',antt:false,alerta:false},
+  {f:'Saveiro',p:'QLF8656',m:'VW Nova Saveiro',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:104,cap:2,emp:'S2',antt:false,alerta:false},
+  {f:'Virtus 1',p:'QWK5075',m:'VW Virtus MF 1.6',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:117,cap:5,emp:'S2',antt:false,alerta:false},
+  {f:'Virtus 2',p:'TNO4B08',m:'VW Virtus Sense 1.0T',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,emp:'S2',antt:false,alerta:false},
+  {f:'Virtus 3',p:'TNO8A97',m:'VW Virtus Sense 1.0T',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,emp:'S2',antt:false,alerta:false},
+  {f:'Voyage',p:'QLC6185',m:'VW Novo Voyage TL',cat:'Carro / utilitário',mot:'VW EA211 1.0 MPI',cv:82,cap:5,emp:'S2',antt:false,alerta:false},
+];
+
+const catBadge={
+  'Ônibus rodoviário':'<span class="badge b-rod">Rodoviário</span>',
+  'Micro-ônibus':'<span class="badge b-micro">Micro-ônibus</span>',
+  'Van':'<span class="badge b-van">Van</span>',
+  'Carro / utilitário':'<span class="badge b-car">Carro</span>',
+  'Caminhão':'<span class="badge b-cam">Caminhão</span>',
+};
+
+let activeCat='';
+
+// KPIs
+document.getElementById('k-rod').textContent=FROTA.filter(v=>v.cat==='Ônibus rodoviário').length;
+document.getElementById('k-micro').textContent=FROTA.filter(v=>v.cat==='Micro-ônibus').length;
+document.getElementById('k-van').textContent=FROTA.filter(v=>v.cat==='Van').length;
+document.getElementById('k-car').textContent=FROTA.filter(v=>v.cat==='Carro / utilitário').length;
+
+
+function setCat(el,cat){
+  activeCat=cat;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function clearSearch(){
+  document.getElementById('q').value='';
+  render();
+}
+
+function render(){
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  let data=FROTA.filter(v=>{
+    if(activeCat && v.cat!==activeCat) return false;
+    if(!q) return true;
+    return v.f.toLowerCase().includes(q)||v.p.toLowerCase().includes(q)||
+           v.m.toLowerCase().includes(q)||v.mot.toLowerCase().includes(q);
+  });
+  const tbody=document.getElementById('tbody');
+  if(!data.length){
+    tbody.innerHTML='<tr><td colspan="9" class="no-results">Nenhum veículo encontrado para essa busca.</td></tr>';
+  } else {
+    tbody.innerHTML=data.map(v=>`<tr>
+      <td class="frota-num">${v.f}</td>
+      <td><span class="placa">${v.p}</span></td>
+      <td>${v.m}</td>
+      <td>${catBadge[v.cat]||v.cat}</td>
+      <td class="motor-tag">${v.mot}</td>
+      <td class="dim">${v.cv} cv</td>
+      <td class="dim">${v.cap}P</td>
+      <td class="dim">${v.emp}</td><td>${v.antt?'<span class="badge b-antt">ANTT</span>':''}</td>
+    </tr>`).join('');
+  }
+  document.getElementById('count').textContent=`${data.length} de ${FROTA.length} veículos`;
+}
+render();
+</script>
+</body>
+</html>
