@@ -5,111 +5,191 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Frota WS Receptivo</title>
 <style>
+:root {
+  --bg:        #0A0A0A;
+  --card:      #141414;
+  --card-h:    #1C1C1C;
+  --txt:       #FFFFFF;
+  --txt2:      #C3C6C2;
+  --neutral:   #8A8D88;
+  --grid:      #242424;
+  --ring:      rgba(255,255,255,0.08);
+  --azul-ws:   #004070;
+  --azul-med:  #0070B0;
+  --ciano:     #00B0D0;
+  --verde:     #8FB81F;
+  --ok:        #0CA30C;
+  --atencao:   #FAB219;
+  --grave:     #EC835A;
+  --critico:   #D03B3B;
+  --s1:#1F9CBB; --s2:#77A024; --s3:#3F92E0; --s4:#BF8210; --s5:#D768A0;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;color:#1a1a1a;background:#f4f6f9;min-height:100vh}
-header{background:#1A3A5C;color:#fff;padding:14px 20px;display:flex;align-items:center;gap:12px}
-header h1{font-size:16px;font-weight:600}
-header span{font-size:12px;opacity:.7;margin-left:auto}
-.container{padding:16px 20px;max-width:1100px;margin:0 auto}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:14px;min-height:100vh}
+a{color:inherit;text-decoration:none}
 
-/* KPIs */
-.kpis{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-.kpi{background:#fff;border-radius:8px;padding:10px 16px;flex:1;min-width:110px;border:.5px solid #dde3ec}
-.kpi-label{font-size:11px;color:#666;margin-bottom:3px}
-.kpi-val{font-size:22px;font-weight:600;color:#1A3A5C}
+/* ── HEADER ── */
+header{
+  background:linear-gradient(90deg, #000000 0%, var(--azul-ws) 60%, var(--azul-med) 100%);
+  padding:0 24px;
+  display:flex;align-items:center;gap:16px;
+  position:relative;height:62px;
+}
+header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--ciano),var(--verde));
+}
+header img{height:40px;object-fit:contain}
+.header-title{display:flex;flex-direction:column}
+.header-title h1{font-size:15px;font-weight:600;color:#fff;letter-spacing:.02em}
+.header-title span{font-size:11px;color:var(--ciano);margin-top:1px}
+.header-right{margin-left:auto;font-size:11px;color:var(--txt2)}
 
-/* busca */
-.search-row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+/* ── LAYOUT ── */
+.container{padding:20px 24px;max-width:1200px;margin:0 auto}
+
+/* ── KPIs ── */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--ring);border-radius:8px;padding:12px 14px}
+.kpi-label{font-size:11px;color:var(--neutral);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.kpi-val{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+.kpi-sub{font-size:11px;color:var(--txt2);margin-top:2px}
+
+/* ── FILTROS ── */
+.filter-section{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.search-row{display:flex;gap:8px;align-items:center}
 .search-wrap{position:relative;flex:1}
-.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#999;pointer-events:none}
-.search-wrap input{width:100%;padding:9px 12px 9px 34px;font-size:14px;border:.5px solid #ccc;border-radius:8px;background:#fff;outline:none;transition:border .15s}
-.search-wrap input:focus{border-color:#2a6099;box-shadow:0 0 0 2px rgba(42,96,153,.12)}
-.btn-clear{padding:8px 14px;border-radius:8px;border:.5px solid #ccc;background:#fff;color:#666;font-size:13px;cursor:pointer}
-.btn-clear:hover{border-color:#999;color:#333}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--neutral);pointer-events:none}
+.search-wrap input{
+  width:100%;padding:9px 12px 9px 34px;font-size:13px;
+  background:var(--card);border:1px solid var(--ring);border-radius:8px;
+  color:var(--txt);outline:none;transition:border .15s;
+}
+.search-wrap input::placeholder{color:var(--neutral)}
+.search-wrap input:focus{border-color:var(--ciano);box-shadow:0 0 0 2px rgba(0,176,208,.15)}
+.btn{padding:8px 14px;border-radius:8px;border:1px solid var(--ring);background:var(--card);color:var(--txt2);font-size:13px;cursor:pointer;transition:all .15s}
+.btn:hover{border-color:var(--ciano);color:var(--ciano)}
 
 /* chips */
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:.5px solid #ccc;background:#fff;color:#555;font-size:12px;cursor:pointer;transition:all .15s;user-select:none}
-.chip:hover{border-color:#2a6099;color:#2a6099}
-.chip.active{background:#1A3A5C;border-color:#1A3A5C;color:#fff}
-.chip svg{flex-shrink:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid var(--ring);background:var(--card);color:var(--txt2);font-size:12px;cursor:pointer;transition:all .15s;user-select:none}
+.chip:hover{border-color:var(--ciano);color:var(--ciano)}
+.chip.active{background:var(--azul-ws);border-color:var(--ciano);color:var(--ciano)}
 
-/* tabela */
-.card{background:#fff;border-radius:10px;border:.5px solid #dde3ec;overflow:hidden}
+/* ── TABELA ── */
+.table-card{background:var(--card);border:1px solid var(--ring);border-radius:10px;overflow:hidden}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#1A3A5C;color:#fff;font-weight:500;padding:9px 11px;text-align:left;font-size:11px;letter-spacing:.04em;white-space:nowrap}
-td{padding:7px 11px;border-bottom:.5px solid #eef0f3;vertical-align:middle}
+th{background:#0D0D0D;color:var(--neutral);font-weight:500;padding:9px 12px;text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--grid);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--grid);vertical-align:middle;font-variant-numeric:tabular-nums}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#f7f9fc}
-.frota-num{font-weight:700;color:#1A3A5C}
-.placa{font-family:monospace;font-size:12px;background:#eef0f3;padding:2px 6px;border-radius:4px;letter-spacing:.07em}
-.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
-.b-rod{background:#dae3f3;color:#1A3A5C}
-.b-micro{background:#e2efda;color:#1B5E20}
-.b-van{background:#fce4d6;color:#7F3F00}
-.b-car{background:#f2f2f2;color:#444}
-.b-cam{background:#f3e4f6;color:#6A1B9A}
-.b-antt{background:#e6f4ea;color:#1B5E20;font-weight:600}
-.motor-tag{color:#555;font-size:12px}
-.dim{color:#888;font-size:12px}
+tr:hover td{background:var(--card-h)}
+.frota-num{font-weight:700;color:var(--ciano);font-size:13px}
+.placa{font-family:monospace;font-size:12px;background:#1E1E1E;padding:2px 7px;border-radius:4px;letter-spacing:.08em;border:1px solid var(--grid)}
+.motor-tag{color:var(--txt2);font-size:12px}
+.dim{color:var(--neutral);font-size:12px}
 
+/* badges categoria */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.02em}
+.b-rod  {background:rgba(31,156,187,.18);color:var(--s1);border:1px solid rgba(31,156,187,.3)}
+.b-micro{background:rgba(119,160,36,.18);color:var(--s2);border:1px solid rgba(119,160,36,.3)}
+.b-van  {background:rgba(63,146,224,.18);color:var(--s3);border:1px solid rgba(63,146,224,.3)}
+.b-car  {background:rgba(191,130,16,.18);color:var(--s4);border:1px solid rgba(191,130,16,.3)}
+.b-cam  {background:rgba(215,104,160,.18);color:var(--s5);border:1px solid rgba(215,104,160,.3)}
+.b-antt {background:rgba(143,184,31,.15);color:var(--verde);border:1px solid rgba(143,184,31,.35);font-weight:600}
 
-.footer{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:12px;color:#888}
-.no-results{text-align:center;padding:2.5rem;color:#999;font-size:13px}
+/* footer */
+.footer{display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;font-size:11px;color:var(--neutral)}
+.no-results{text-align:center;padding:3rem;color:var(--neutral);font-size:13px}
 </style>
 </head>
 <body>
 
 <header>
-  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M1 10h22M5 19v2M19 19v2"/><circle cx="7" cy="15" r="1" fill="white"/><circle cx="17" cy="15" r="1" fill="white"/></svg>
-  <h1>Frota WS Receptivo</h1>
-  <span>65 veículos · Maceió – AL</span>
+  <img src="data:image/png;base64,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RQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABSEhQSSAAMkk8AUMyopZmCqBkknAArnNT1RrkmKI4iHfoW+tZVa0acbs1p0nUdlsLqmp/aSYYiRED/30ayqKK8arVlUlzSPThBQVkJRRRWRYUUUUAFFFFABRRRQAUUUUAFFFFABXoHwS/5K9oX/AG8f+k8lef16B8Ev+SvaF/28f+k8lAHn9FFFABRRRQAUUUUAFFFFABRRRQBLFK8MgkjYqw6EV0mn6ol4Aj4SYduzfT/CuXpQxUgjgjoRW9GvKk/Iyq0o1FrudvRWLp+sg4iujg9A/wDj/jW0CCAQQQeQR3r2KdWNRXiebUpyg7MKKKK0MwooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACo5po4Iy8jbVH+cCoby+hs0y53Pj5UB/zge9c1d3st5LukbgdFHQCueviY0lbqb0qDn5In1DU3vG2rlYgeF9frWfRRXkVKkqj5pHpQgoKyEooorMoKKKKACiiigAooooAKKKKACiiigAooooAK9A+CX/ACV7Qv8At4/9J5K8/r0D4Jf8le0L/t4/9J5KAPP6KKKACiiigAooooAKKKKACiiigAooooAK0LHVJbMhT88XdSen09Kz6WrhOUHeJMoqSszsba7hu03xODjqD1H1FT1xUUzwyB43KsOhFbtnrivhLoBW6bx0P1H+fwr06OMjLSejOGrhnHWOqNiikVldQysGUjIIOQaWu05AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiqt3qNvaAh23SdkXr+PpUykoq7dkNJt2WrLRIAJJAAGST2rHv9aWMmO1wzd3PQfT1/l9azLzU57wkE7I/wC4vSqXeuCvjelM7aWF6zHPI0jl3YsxOSSaZRS15zd9WdtrCUUUUgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAr0D4Jf8AJXtC/wC3j/0nkrz+vQPgl/yV7Qv+3j/0nkoA8/ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKALVrfT2hzE5x3U9D+FblprUE+Fl/dP6k5X/61c1RXRSxM6e2qMqlCE9XuduCCAQQQeQQeDS1yFtfXFqf3UhA7qehrYttdifCzoUP95eR+Xb9a9CnjIT0ejOKeGnHbVGvRTI5o5l3ROrD2OcU+upNNXRztNOzCiiimIKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKOgyapXGq2tvkF97D+FOf16VMpKKu3YpRcnZK5dqvcXkFqP3sgzj7o5P5Vh3OtXE2Vj/dL7Hn86zSxYksST9a46uNitIanVTwrestDUu9bmlysH7tD3z8x/HtWUSSST196Skrz6lWdR3kzshTjBe6gooorIsKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAK9A+CX/JXtC/7eP/SeSvP69A+CX/JXtC/7eP8A0nkoA8/ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAfHI8TBkYqw7g4rSg1y5i4fEq+/B/OsuitIVZw1iyZQjL4kdLDrdrJgOGiPuMj9P8KvxTxTDMciN/ukHFcXShiDkEg11wx0l8Suc0sJF/DodvRXJxandxfdnYj0bn+dXI/EEy/wCsiRvcHBrpjjab30MZYWa21OgorITX7c/fikU+2D/hVlNXsm/5bYPoQf8ACto16ctpIydGa3TL1FQLfWr9LiP6FsfzqQTRN92RD9GBq1JPYzaa3Q+ijIPQ5oqhBRRTS6jqwH1OKV7AOoqJrq3X708Q/wCBj/GoW1OzTrcL+GT/ACFJyit3YpRb2LdFZr65Zr03t9F/+uKqv4g6iOD8Wb+lZSxFKO8jRUKj6G5QSACSQAOpNczLrV3J0ZUHoo/xqjJcSzHMkjt/vHNYyx1NfCrmscJN7ux1M2p2kPWYMR2Xn+XFZ0/iA8iCL/gTn+lYdFc08bUe2hvHCwjvqWZ765uf9bKSD2zx+VVqKSuWU5Sd5M6FGK0SCiiioGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAV6B8Ev+SvaF/wBvH/pPJXn9egfBL/kr2hf9vH/pPJQB5/RRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFGaKKd2AoJ9aNzep/Okoo5mFhdx7k/nSZNFFF2FgooopXAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACvQPgl/yV7Qv+3j/0nkrz+vQPgl/yV7Qv+3j/ANJ5KAPP6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACvQPgl/yV7Qv+3j/wBJ5K8/r0D4Jf8AJXtC/wC3j/0nkoA8/ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAK9A+CX/JXtC/7eP/SeSvP69A+CX/JXtC/7eP8A0nkoA8/ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAK9A+CX/JXtC/7eP/AEnkrz+vQPgl/wAle0L/ALeP/SeSgDz+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAr0D4Jf8le0L/t4/9J5K8/r0D4Jf8le0L/t4/wDSeSgDk00O5dFcNHhgCPm/+tTv7Buv78X5n/Ct+3/49ov9wf0pzSImN7quemSBmvVWCp2u2zgeKmnaxz39gXX9+L8z/hUE+k3cCljHuUd1OcV06yxucLIrH0DAmn0PBU2tGJYuaeqOHpK0tZtlt7zKDCuNwA7f5/rWdXm1IOEuVndCSlFSQlFFFQUaNvpE91brMjR7WzjJx/T2qX+wbr+/Fn6n/CtXSP8AkFw/8C/9CNXGdUGWYKPUnAr06WEpygpO+pxTxMoycUtjnv7Buv78X5n/AAqO40i4toHmdo9q4yAc98V0f2iH/ntH/wB9CqeqzRPpsyrKhJAwAwJPIpywlJRbTFHEzbStuctRRRXlncFOVSxAAyTTa3tBtVKvcsASDtXPbjk/qK0p03Ukoomc1CLkynHot5IM7VQHpuPNSf2Bdf34vzP+FdHTBNGW2iRM9MBhmvSWCppa3OF4ufRI5qbR7yFS2wOB/cOf061QIIODXb1z+u2yxypOgAD5BA9R3/GsK+EUI80WbUcS5y5ZIxqKKK4DqFq/a6VPdw+bGyAEkfMcVQrp9E/5By/7xrow9NVJ8rMq03CN0Zv9gXX9+L8z/hR/YF1/fi/M/wCFdEzKgLMwUDuTgUz7RB/z2j/76Fd31Kktzk+tTeyOcm0a4ghaVmj2qMnB5/lWdXV6hPE1hMFkQkrwAwJNcpXHiaUabSidNCo6iuxKKKK5Tcu2enS3qs0ZQBTg7jVn+wbr+/F+Z/wq34f/AOPeX/fH8q1yQASSABySTgCvRoYWE6akzjq4iUJ8qRzv9g3X9+L8z/hTJNFu0GQFcf7JrovPhJwJUJPYMKkrT6lTezZn9an2OJZSjFWGCKZW/r1quxblQN2drY7+hrArz61J05crOynUU48yCnohd1QdWIA/Gm1LbkfaIiT0cH9azW9jQ0P7Auv78X5n/Cj+wLr+/F+Z/wAK3/tEH/PaP/voU5WVxuVgwPcHIr1Fg6TPPeKmuhz39gXX9+L8z/hR/YF1/fi/M/4V0LOqDLMFHqTgU37RB/z2j/76FP6lSW4fWpvocYylGKnqDim1JN/rnP8AtH+dR15UlZnethauWeny3wZo2QBcA7jiqVdB4e/1U31H9a1owU6iiyKsnCDaKcuiXMUTyM0ZVFLHB7Yz6VmV2V5/x4z/APXNv5GuNNa4qhGk1ykUKrqJtiUUUVyG5oWulTXcAljaPGSOTzRdaVPaQGWRkKggfKc1p6A+bWSPurZ/Mf8A1qt6mm/TZx6Ln8iD/SvQp4aE6XOck68o1OTocjTlUswA6mkqzYJ5l9AvUbx+VcKV3Y629C5/YN1/fix9T/hVK7tXs5fLkKk4z8vpXYVyurvv1KXHRcL+Q/xrtxGHhTp8y3OWjXlOdihRRRXAdQtXbfTLq5UOseF7M3GaXSrZbm9AcZRQWI/z711XQYFdmGw3tdXsc9ev7PRbnOf2Ddf34vz/APrUHQLofxxf99f/AFq6BpY0OGdVPoSBSrIj52OrY64INdX1KltdnP8AW59jk7nT7m1G6SM7f7w5FVa7ZlV1KsAVIwQRwRXJX1v9mvJIhnCnj6dRXJicN7KzT0OihX9po1qVaKKK5DoCiiigAr0D4Jf8le0L/t4/9J5K8/r0D4Jf8le0L/t4/wDSeSgCpb/8e0X+4P6Vj+Iv+Xf/AIF/Sti3/wCPaL/cH9Kx/EX/AC7/APAv6V7Nf+AzzaP8ZGKjsjqykgg5BFdpGxeJGPUqCfxFcSK7SD/j3j/3B/KubAN3aNsWlZMxvEXW39fm/pWJW34i62//AAL+lYlYYv8AjM1w38JCUUUVzG51ej/8gqH8f5motc/5B/8AwMf1qXR/+QVD9D/M1Frn/IP/AOBj+teyv92+R5j/AI/zOZooorx7s9MKKKKQC10+if8AINX3Y1zFdPon/INX/eNdeC/inPiv4ZJqzlNNlKkgnAOPTvXKZrqdZ/5Bkn1H865Y1pjm+dehOEXuP1OvsHaWwhdiSxXqepxxVPX/APjyjP8A00H8jUNnrFtBZxxOshZRgkAev1qHU9SgvLZY41cEPu+YD0raVWDoWvrYyVKSrXtpcx6KKK8o7xa6fRP+Qcv+8a5iun0T/kHL/vGuvBfxTnxX8MdrP/IMl+o/mK5btXU6z/yDJfqP5iuW7VeP/iInCfAxKKKK4TqCiiigDofD/wDx7y/74q/f/wDIPuP9w1Q8P/8AHvL/AL4q/f8A/IPuP9w17GH/AIH3nm1/433HIV1Ojuz6cm452kgE+lctXT6J/wAg1f8AeNceDb9qdOKX7sdrP/IMl9iP51y1dTrP/ILl/wCA/wA65aqx/wDEQsJ8DEooorhOoXtXU6N/yDIvqf5muW7V1Ojf8gyL6n+ZrswL/eHNiv4Ymtf8g5v94Vy9dPrf/INb/eFcxVY7+IvQWE+ASiiiuE6hRW94e/1U/wDvD+RrBFb3h7/VT/7w/ka6ML/GRjiP4bNO9/48bj/rm38jXG12V7/x43H/AFzb+Rrja6Mf8SMcHswooorzzsNnw8+LiWP+8oP5H/69bsyeZBIn95SPzGK5rRn2aigzgNkH8q6ivWwbvTs+jPOxStO5w9aGipv1ND2UE/piqlxH5d1Kn91yK0/D6ZuJX/upj8z/APWrgpx/fKPmdtSX7tvyOgrjLmTzbmV/7zE/ma6+4fy7eV/7qE/kK4s9a7MfLRI5cGt2JRRRXmHcbPh7Hnzeu3+tb7HCk+gzWB4e/wBfN/u/1ref7p+hr2MH/CPNxX8Q4t3aSRmYksTkmp7F2jvYWUkHeB+tVqms/wDj8g/66L/OvKUnzHo2VrHZVzOuDGon/dFdNXM67/yET/uivUxn8H7jzsN/EMyiiivIPSCiiigAr0D4Jf8AJXtC/wC3j/0nkrz+vQPgl/yV7Qv+3j/0nkoAqW3/AB7Rf7g/pWP4i/5d/wDgX9K2Lf8A49ov9wf0rP1mznuvI8lN23dnkDGcep9q9qum6DS3PMpO1ZX8znB1rs4P+PeP/cH8q52LRrxpAHQIueW3Dj9a6VQFUKOgAArnwUJRk20bYuUWkkzD8Q9bf/gX9KxO1bPiFszQp3Ck/mf/AK1Y3aubGfxn8jfD/wAJCUUUVzGx1ekf8guH8f5mo9c/5B//AAMf1qTR/wDkFw/8C/8AQjVuSKOVdsiKy5zhhkZr24RcqCiuqPMlJRrXfRnFUV2H2G0/594v++RWTrkEMKQmKJUyTnaMZ6V588HOEXJs644iEmkjEooorkOgWun0T/kGr/vGuYrp9E/5Bq/7xrrwX8U58V/DHa1/yDJPqP51y3auo1r/AJBkn1H865ftVY7+IvQnCfAxKKKK4jqCiiigBa6fRP8AkHL/ALxrmK6fRP8AkHL/ALxrrwX8U58V/DHaz/yDJfqP5iuWrtpI0lTZIoZfQ81D9htf+feL/vkV14nDyqyTRz0K8acbM4+it3W7aCG2jaOJFJbBKjGRWFXnVaTpy5WdsJqauhKKKKyLOh8P/wDHvL/vir9//wAg+4/3DVDw/wD8e8v++Kv3/wDyD7j/AHDXsYf+B955tf8AjfcchXT6J/yDV/3jXMV1GiqV01CRjJJH0riwf8U6sV/DF1n/AJBcv/Af51y1dTrJ/wCJZL7kfzrlqvH/AMRE4T4GJRRRXCdQvaup0b/kGRfU/wAzXLdq6nRv+QZF9T/M114H+Kc2K/hjdb/5Brf7wrmK6fW/+Qa3+8K5iqx/8RegsJ8AlFFFcR1Cit7w9/qp/wDeH8jWCK3vD3+qn/3h/I10YX+MjHEfw2ad7/x43H/XNv5GuNrsr3/jxuP+ubfyNcbXRj/iRjg9mFFFFeedhYs5PLu4Xz0cH8M12NcOOtdrC/mQxv8A3lB/MZr0cBL4kcWMWiZy+qp5epzDsSD+YzWn4fTFvNJ6sB+Qz/Wqmux7b5WxwyA/zFaeipt01D/eYn9cf0pU4f7U/vKqSvQQ/Vn2abKc8kBR+JH9M1yddHr74tI0zyz5/Af/AKxXO1GOlepYrCL3LiUUUVxHSbPh7/Xzf7v9a3n+6foawfD3+vm/3f61vP8AdP0Nexg/4R5uJ/iHE1Naf8fkP/XRf51DU1p/x+Q/9dF/nXk/aPR6HZVzOu/8hE/7orpq5nXf+Qif90V6uM/g/cedhv4hmUUUV5B6QUUUUAFegfBL/kr2hf8Abx/6TyV5/XoHwS/5K9oX/bx/6TyUAVLb/j1i/wBwf0p5YDqQM+pplv8A8e0X+4P6VkeIv+Xf/gX9K92c+Slzb2PKjDnqct7G0CCMggj2NR3FxHbQmWUkKOOOST6VleH5cpNET0IYD68H+lXtUi83TpgByBuH4c/yBpQq89PnitQnT5anK3poc3eXTXdy0rcZ4A9B2FV6KK8WUnJts9RJJWQlFFFSM6vSP+QXD/wL/wBCNSahdNZ23mqoY5xg9Kj0f/kFw/8AAv8A0I1Frn/IP/4GP617UZOOHTXRHlyV6zT7lP8A4SGX/nin5mqd9qL3yoGRV256d84/wqlRXmSxFSSabO+NGnF3S1EooorA1Frp9E/5Bq/7xrmK6fRP+Qav+8a68F/FOfFfwxda/wCQZJ9R/OuX7V1Otf8AIMk+o/nXLdqrHfxF6E4T4GJRRRXEdQUUUUALXT6J/wAg5f8AeNcxXT6J/wAg5f8AeNdeC/inPiv4ZZvrlrS0aZQCV7Hp2rI/4SGb/ngn5mtDWf8AkGS/UfzFct1roxdacJpRZjh6UJwbkrl++1N72NUaNVCnOQevas+lpK8+c5Td5M7IwUFZBRRRUFHQ+H/+PaX/AHxWuyqylWUMp4wRkEVkeH/+PaX/AHxWncSmG3kkUAlFyM9Ole1hf4KueZiL+1dhPslsDkW8P/fA/wAKmwABgAAcACue/wCEgn/54x/r/jTJNduXBACJ7gHP61CxNCOxToVpb/mXNeuVEKW6n5ictjsP8/yrn6c7tIxd2LMepJpledXq+1nc7aVP2ceUKKKKxNBe1dTo3/IMi+p/ma5btXU6N/yDIvqf5muvA/xTmxX8Mbrf/INb/eFcxXT63/yDW/3hXMVWP/iL0FhPgEoooriOoUVveHv9VP8A7w/kawRW94e/1U/+8P5GujC/xkY4j+GzTvf+PG4/65t/I1xtdle/8eNx/wBc2/ka42ujH/EjHB7MKKKK887Ba6zS38zTYTnkAr+prk66PQX3WTpnlXP5ED/69dmClaqc+KV6foQeIU4gcD1B/wA/nWpYJ5dhAvT5AT9SM/1qrrcfmWS46iQf1/8ArVoqoRQo6AACu6MP37l5HJKf7lLzMHxC+Z4Y/wC6pP5nH9Kxq0NZffqLjsoAFZ9ebiZXqyO6grU0hKKKK5zU2fD3+vm/3f61vP8AdP0NYPh7/Xzf7v8AWt5/un6GvYwf8I83E/xDiamtP+PyH/rov86hqa0/4/If+ui/zryftHo9Dsq5nXf+Qif90V01czrv/IRP+6K9XGfwfuPOw38QzKKKK8g9IKKKKACvQPgl/wAle0L/ALeP/SeSvP69A+CX/JXtC/7eP/SeSgCpb/8AHtF/uD+lY/iL/l3/AOBf0rYt/wDj2i/3B/SsfxF/y7/8C/pXs1/93Z5tH+Mirokvl6gF7OpX/P5V0rKHUqeQQQfoa461k8m6ik/usDXZVlgZXi4l4uPvJnFSIY5HQ9VODTKvavH5eoyYGA3zfn/9fNUa8+pHlm0dsHeKYlFFFZlHV6P/AMgqH6H+ZqLXP+Qd/wADH9al0f8A5BUP0P8AM1HrgJ0/AGfnHQfWvYX+7fI8x/x/mcxRT/Lf+635UhRgMkHH0ryLHpjaKKKQC10+if8AINX/AHjXMV0+iHOnKP8AaOa68F/FOfFfwx2s/wDINk+o/nXLV1mpwvNYSIikt1wOvbNcsIpCdojbPpg1eOT50/InCP3H6liPTbuaNZI4soehyOabPY3FsgaaPapOOoNdPYxtDZQxvwQvI9D1xVHXz/oSDuXz+lN4SKpc9+gliG6nLY5yiiiuA6xa6fRP+Qcv+8a5iun0T/kHL/vGuvBfxTnxX8MdrP8AyDJfqv8AMVy3aup1gZ0yUDOcjgfWuY2N/db8qvHJ86JwnwMZRTijAZ2nH0ptcJ1BRRRQB0Ph/wD495f98fyq/f8A/Hhcf7hqh4f/AOPeX/fFX7//AJB9x/uGvYw/8D7zza/8b7jj6KKK8c9IKKKKACiiigBe1dTo3/IMi+p/ma5btXU6N/yDIvqf5muvA/xTmxX8Mbrf/INb/eFcxXT63/yDW/3hXMVWP/iL0FhPgEoooriOoUVveHv9VP8A7w/kawRW94e/1U/+8P5GujC/xkY4j+GzTvf+PG4/65t/I1xtdle/8eNx/wBc2/ka42ujH/EjHB7MKKKK887Ba2vDz4kmj9QG/L/9dYtaOiPt1FR/fBX9P/rVtQly1Iszqq8Gjo5ovNj29tyn8jUlFMlfy4ZH/uqT+QzXuWWrPKu7KJyN5J5l5M/UFyfwzUFB5JNFfPzd5NnsJWSQlFFFSM2fD3+vm/3f61vP90/Q1g+Hz/pEw9V/rW+RkEeoxXsYP+Eebiv4hxHeprT/AI/IP+ui/wA6JreWGQo8bAg+lS2FvJLeRAI2A4JODwK8rlfNbzPRurXOtrmdc/5CJ/3RXTVzGuEf2i2OygfpXqYz+F9x5+G/iGbRRRXkHohRRRQAV6B8Ev8Akr2hf9vH/pPJXn9egfBL/kr2hf8Abx/6TyUAVLf/AI9ov9wf0rH8Rf8ALv8A8C/pX0gvwI8OooVdY1wADAHmQf8Axqobn9n7wvd7fO1XXG25x++hHX/tl7V6FXFQlScFe5x06Eo1OZ7HyzXY2cvnWUMmckoPzAwf1r27/hnHwh/0Etc/7/xf/Gqtw/ATw1bxCOPVtcCDoPNhP/tKsMNWVKV3sbV6XtI2R83+II8SQy+oK/5/OsWvqi4+AHhi6QJNquuMoOQPNhH/ALSqt/wzj4P/AOglrn/f+H/41U15xnNyiVSi4wUWfL9FfT//AAzj4P8A+glrn/f+H/41R/wzj4P/AOglrn/f+H/41WBoeF6R/wAguH/gX/oRq9XuUPwE8NwRLHHq2uBF6DzYD/7Sp/8Aworw9/0GNc/7+Qf/ABqvTpYynGCi76HDUw05TclY8Kqlq3/ILn+g/mK+gv8AhRPh7/oMa5/38g/+NUyb4C+G54mjk1fXCjdR5sA/9pU5Yyk4tJCjhqiabZ8qUV9P/wDDOPg//oJa5/3/AIf/AI1R/wAM4+D/APoJa5/3/h/+NV5Z3nzBW1od4sZa3kbAY5Unpn0/Hivob/hnHwf/ANBLXP8Av/D/APGqP+GcfCA/5iWuf9/4f/jVaUqjpzUkROCnHlZ4xRXuMfwE8NxABNY17A7GeE/ziqT/AIUV4e/6DGuf9/IP/jVej9epvdHF9Vn0Z4VXOa1drcTrFGdyR55HcmvpOb4A+Gp1KyaxrxU9QJ4QD+UVVv8AhnHwh/0Etc/7/wAP/wAarGvi1OPLFGtHDcj5pPU+X6K+n/8AhnHwf/0Etc/7/wAP/wAao/4Zx8H/APQS1z/v/D/8argOs+Ya6fRP+Qcv+8a94/4Zx8If9BLXP+/8X/xqrUHwD8NW0Yji1bXFUdvNhP8A7Srow9SNOfNIyrQc48qPDqK91/4UT4e/6DGuf9/IP/jVH/CifD3/AEGNc/7+Qf8Axqu542k+jOP6rU7o8A1D/kHz/wC5XImvquT4DeG5o2jfV9cKsMEebAP/AGlVP/hnHwh/0Etc/wC/8P8A8arjxNaFRpxOqhTlTVmfL9FfT/8Awzj4P/6CWuf9/wCH/wCNUf8ADOPg/wD6CWuf9/4f/jVcpueA+H/+PaX/AHxV+/8A+PC4/wBw17xb/ADwxaqVh1XXFB5I82E/+0qkk+A3hyWNkfV9cKsMEebBz/5Cr0KWKhClyO9zjqUJSqcyPlOivp//AIZx8H/9BLXP+/8AD/8AGqP+GcfB/wD0Etc/7/w//Gq887D5gor6f/4Zx8H/APQS1z/v/D/8ao/4Zx8H/wDQS1z/AL/w/wDxqgD5gor6f/4Zx8H/APQS1z/v/D/8ao/4Zx8H/wDQS1z/AL/w/wDxqgD5hrqdG/5BkX1P8zXu3/DOPhD/AKCWuf8Af+L/AONVag+Afhq3iEcWra4qDOB5sJ/9pV0YarGnPmkZVoOceVHz7rf/ACDW/wB4fzrmK+qZ/gH4auYzHLq2uMp7ebCP/aVVf+GcfCH/AEEtc/7/AMP/AMap4mrGpO8RUKbpxsz5for6f/4Zx8H/APQS1z/v/D/8ao/4Zx8H/wDQS1z/AL/w/wDxquY2PmGt/wAPf6qb/eH9a+gP+GcfCH/QS1z/AL/w/wDxqrFv+z/4YtAwh1XXFDdf3sJ/9pVtQmoTUmRVi5QcUeFXn/HjP/1zb+Rrja+rH+A/hyRGRtX1wqwII82DnP8A2yql/wAM4+D/APoJa5/3/i/+NVriq8arXKZ0KTpppny/RX0//wAM4+D/APoJa5/3/h/+NUf8M4+D/wDoJa5/3/h/+NVyG58w1ZsX8u+hboN4z9K+lf8AhnHwf/0Etc/7/wAP/wAapR+zl4QByNS1zP8A13h/+NU4uzTE9VY8Yqpqb+XpsxzyV2/qP8a+gP8AhRXh7/oMa5/38g/+NVHP8AvDVxGY5dW1xlPbzYB/7Sr1JY2m4tK9zhjhZKSvax8q0V9P/wDDOPg//oJa5/3/AIf/AI1R/wAM4+D/APoJa5/3/h/+NV5R3nzBRX0//wAM4+D/APoJa5/3/h/+NUf8M4+D/wDoJa5/3/h/+NUAfNum3QtLxXbOwjDfQ11asrqGUhlIyCDkEV7R/wAM4+EP+glrn/f+L/41U8P7Pvhi34i1fXlHp58OPy8quvDYn2Wj2OevQ9pqnqeI0V7r/wAKJ8Pf9BnXP+/kH/xqj/hRPh7/AKDGuf8AfyD/AONV1/XaXY5/qtTujweWVIY2kkbCrXI3c5ubqSY8bjwK+nZv2evC1wcy6trzY6ZuIuP/ACFUX/DOPhD/AKCWuf8Af+H/AONVy4nE+1SSWh0UKHs7tvU+X6K+n/8AhnHwf/0Etc/7/wAP/wAao/4Zx8H/APQS1z/v/D/8arjOg+YKK+n/APhnHwf/ANBLXP8Av/D/APGqP+GcfB//AEEtc/7/AMP/AMaoA+YK9A+CX/JXtC/7eP8A0nkr1/8A4Zx8H/8AQS1z/v8Aw/8Axqtjwt8FPDfhHxHaa5YXuqyXVrv2JPLGUO5GQ5AjB6Me9AH/2Q==" alt="WS Receptivo">
+  <div class="header-title">
+    <h1>Gestão de Frota</h1>
+    <span>W2S Locação de Veículos • S2 Turismo — Maceió / AL</span>
+  </div>
+  <div class="header-right">65 veículos ativos &nbsp;|&nbsp; atualizado 08/2026</div>
 </header>
 
 <div class="container">
 
-  <div class="kpis" id="kpis">
-    <div class="kpi"><div class="kpi-label">Total</div><div class="kpi-val" id="k-total">65</div></div>
-    <div class="kpi"><div class="kpi-label">Rodoviários</div><div class="kpi-val" style="color:#1A3A5C" id="k-rod">—</div></div>
-    <div class="kpi"><div class="kpi-label">Micro-ônibus</div><div class="kpi-val" style="color:#1B5E20" id="k-micro">—</div></div>
-    <div class="kpi"><div class="kpi-label">Vans</div><div class="kpi-val" style="color:#7F3F00" id="k-van">—</div></div>
-    <div class="kpi"><div class="kpi-label">Carros</div><div class="kpi-val" style="color:#444" id="k-car">—</div></div>
-    
-  </div>
-
-  <div class="search-row">
-    <div class="search-wrap">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="q" type="text" placeholder="Buscar por frota, placa, modelo ou motor…" oninput="render()">
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-label">Total</div>
+      <div class="kpi-val" style="color:var(--ciano)">65</div>
+      <div class="kpi-sub">veículos ativos</div>
     </div>
-    <button class="btn-clear" onclick="clearSearch()">Limpar</button>
+    <div class="kpi">
+      <div class="kpi-label">Rodoviário</div>
+      <div class="kpi-val" style="color:var(--s1)" id="k-rod">—</div>
+      <div class="kpi-sub">ônibus</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Micro-ônibus</div>
+      <div class="kpi-val" style="color:var(--s2)" id="k-micro">—</div>
+      <div class="kpi-sub">unidades</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Van</div>
+      <div class="kpi-val" style="color:var(--s3)" id="k-van">—</div>
+      <div class="kpi-sub">unidades</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Carros</div>
+      <div class="kpi-val" style="color:var(--s4)" id="k-car">—</div>
+      <div class="kpi-sub">utilitários</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">ANTT</div>
+      <div class="kpi-val" style="color:var(--verde)" id="k-antt">13</div>
+      <div class="kpi-sub">registrados</div>
+    </div>
   </div>
 
-  <div class="chips">
-    <button class="chip active" data-cat="" onclick="setCat(this,'')">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Todos
-    </button>
-    <button class="chip" data-cat="Ônibus rodoviário" onclick="setCat(this,'Ônibus rodoviário')">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M1 10h22M5 19v2M19 19v2"/><circle cx="7" cy="15" r="1" fill="currentColor"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
-      Rodoviário
-    </button>
-    <button class="chip" data-cat="Micro-ônibus" onclick="setCat(this,'Micro-ônibus')">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M2 11h20M6 19v2M18 19v2"/><circle cx="7" cy="14" r="1" fill="currentColor"/><circle cx="17" cy="14" r="1" fill="currentColor"/></svg>
-      Micro-ônibus
-    </button>
-    <button class="chip" data-cat="Van" onclick="setCat(this,'Van')">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 10L5 5h13l5 5v6H1z"/><path d="M1 16h22"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>
-      Van
-    </button>
-    <button class="chip" data-cat="Carro / utilitário" onclick="setCat(this,'Carro / utilitário')">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12L6 7h12l3 5v4H3z"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>
-      Carro
-    </button>
-    
+  <!-- Filtros -->
+  <div class="filter-section">
+    <div class="search-row">
+      <div class="search-wrap">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="q" type="text" placeholder="Buscar por frota, placa, modelo ou motor…" oninput="render()">
+      </div>
+      <button class="btn" onclick="clearSearch()">Limpar</button>
+    </div>
+    <div class="chips">
+      <button class="chip active" onclick="setCat(this,'')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Todos
+      </button>
+      <button class="chip" onclick="setCat(this,'Ônibus rodoviário')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="6" width="22" height="13" rx="2"/><path d="M1 10h22M5 19v2M19 19v2"/><circle cx="7" cy="15" r="1" fill="currentColor"/><circle cx="17" cy="15" r="1" fill="currentColor"/></svg>
+        Rodoviário
+      </button>
+      <button class="chip" onclick="setCat(this,'Micro-ônibus')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M2 11h20M6 19v2M18 19v2"/><circle cx="7" cy="14" r="1" fill="currentColor"/><circle cx="17" cy="14" r="1" fill="currentColor"/></svg>
+        Micro-ônibus
+      </button>
+      <button class="chip" onclick="setCat(this,'Van')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 10L5 5h13l5 5v6H1z"/><path d="M1 16h22"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>
+        Van
+      </button>
+      <button class="chip" onclick="setCat(this,'Carro / utilitário')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12L6 7h12l3 5v4H3z"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>
+        Carro
+      </button>
+      <button class="chip" onclick="setCat(this,'antt')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+        Com ANTT
+      </button>
+      <button class="chip" onclick="setCat(this,'W2S')">W2S</button>
+      <button class="chip" onclick="setCat(this,'S2')">S2</button>
+    </div>
   </div>
 
-  <div class="card">
+  <!-- Tabela -->
+  <div class="table-card">
     <table>
       <thead><tr>
         <th>Frota</th>
@@ -119,6 +199,7 @@ tr:hover td{background:#f7f9fc}
         <th>Motor</th>
         <th>CV</th>
         <th>Cap.</th>
+        <th>Ano</th>
         <th>Empresa</th>
         <th>ANTT</th>
       </tr></thead>
@@ -128,75 +209,75 @@ tr:hover td{background:#f7f9fc}
 
   <div class="footer">
     <span id="count"></span>
-    <span>Fonte: CRLV Detran-AL • WS Receptivo 2026</span>
+    <span>Fonte: CRLV Detran-AL &nbsp;•&nbsp; WS Receptivo 2026</span>
   </div>
 
 </div>
 
 <script>
 const FROTA=[
-  {f:'701',p:'QLA2804',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,emp:'W2S',antt:false,alerta:false},
-  {f:'702',p:'QLA3654',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,emp:'W2S',antt:false,alerta:false},
-  {f:'703',p:'TNQ7G21',m:'Toyota Hiace DX Pass',cat:'Van',mot:'Toyota 1GD-FTV',cv:148,cap:15,emp:'S2',antt:true,alerta:false},
-  {f:'704',p:'QLM0046',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
-  {f:'706',p:'NMI9338',m:'Volare W9 ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:26,emp:'W2S',antt:true,alerta:false},
-  {f:'707',p:'NML2278',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 904 LA',cv:150,cap:26,emp:'S2',antt:false,alerta:false},
-  {f:'708',p:'NMA4755',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:42,emp:'S2',antt:false,alerta:false},
-  {f:'709',p:'QLL9886',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
-  {f:'710',p:'NMI0278',m:'Volare W9 ON',cat:'Micro-ônibus',mot:'MWM 4.12 TCE',cv:150,cap:26,emp:'S2',antt:false,alerta:false},
-  {f:'711',p:'NLZ5794',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,emp:'S2',antt:false,alerta:false},
-  {f:'712',p:'NLZ5824',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,emp:'S2',antt:false,alerta:false},
-  {f:'713',p:'SAD3F04',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,emp:'W2S',antt:false,alerta:false},
-  {f:'714',p:'SAD2D24',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,emp:'W2S',antt:false,alerta:false},
-  {f:'715',p:'QLM0136',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
-  {f:'716',p:'MUN7648',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,emp:'S2',antt:false,alerta:false},
-  {f:'717A',p:'OHB6701',m:'MB/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:47,emp:'S2',antt:false,alerta:false},
-  {f:'717B',p:'TNT0I72',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'718A',p:'OHC5201',m:'MB/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:47,emp:'S2',antt:false,alerta:false},
-  {f:'718B',p:'TNT0I62',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'719',p:'NMD2991',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:360,cap:52,emp:'S2',antt:false,alerta:false},
-  {f:'720',p:'QWH1694',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,emp:'S2',antt:false,alerta:false},
-  {f:'722',p:'QWH1654',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,emp:'W2S',antt:false,alerta:false},
-  {f:'723',p:'QWH1684',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,emp:'W2S',antt:false,alerta:false},
-  {f:'725',p:'OHH2647',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,emp:'S2',antt:false,alerta:false},
-  {f:'727',p:'ORI2153',m:'VW/Voyage TL MCV',cat:'Carro / utilitário',mot:'VW EA211 1.0 MPI',cv:82,cap:5,emp:'S2',antt:false,alerta:false},
-  {f:'728',p:'SAA9F61',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:381,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'729',p:'SAA0D22',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'S2',antt:false,alerta:false},
-  {f:'730',p:'OHG5463',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:42,emp:'S2',antt:true,alerta:false},
-  {f:'731',p:'SAF9F70',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,emp:'S2',antt:false,alerta:false},
-  {f:'732',p:'QLD4730',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:45,emp:'S2',antt:false,alerta:false},
-  {f:'733',p:'QLA3664',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,emp:'S2',antt:false,alerta:false},
-  {f:'734',p:'SAB8H95',m:'Hyundai HB20S',cat:'Carro / utilitário',mot:'Hyundai Kappa 1.0',cv:80,cap:5,emp:'S2',antt:false,alerta:false},
-  {f:'735',p:'QLL9846',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
-  {f:'736',p:'QLE6489',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:false,alerta:false},
-  {f:'737',p:'QLE6499',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:false,alerta:false},
-  {f:'738',p:'QLG6648',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'739',p:'QLG6688',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'740',p:'QWG4207',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'S2',antt:false,alerta:false},
-  {f:'741',p:'QLH4597',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,emp:'W2S',antt:false,alerta:false},
-  {f:'742',p:'QLF3186',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,emp:'S2',antt:false,alerta:false},
-  {f:'743',p:'QLF3296',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,emp:'S2',antt:false,alerta:false},
-  {f:'744',p:'QLJ4866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
-  {f:'745',p:'QLL9866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,emp:'S2',antt:false,alerta:false},
-  {f:'746',p:'QLL8530',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,emp:'W2S',antt:false,alerta:false},
-  {f:'747',p:'QLM2981',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,emp:'W2S',antt:false,alerta:false},
-  {f:'748',p:'QLI9485',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'749',p:'QLJ5397',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:30,emp:'S2',antt:true,alerta:false},
-  {f:'750',p:'QLI9475',m:'MB/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:354,cap:50,emp:'S2',antt:true,alerta:false},
-  {f:'751',p:'QTT4691',m:'Scania/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:400,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'752',p:'QWG3260',m:'Scania/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:360,cap:48,emp:'S2',antt:true,alerta:false},
-  {f:'753',p:'QWG4177',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'W2S',antt:false,alerta:false},
-  {f:'754',p:'QWG4187',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,emp:'W2S',antt:false,alerta:false},
-  {f:'755',p:'SAI5H68',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,emp:'S2',antt:false,alerta:false},
-  {f:'756',p:'SAI1D18',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,emp:'S2',antt:false,alerta:false},
-  {f:'757',p:'TNJ1J49',m:'Volare V8L MO',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:157,cap:19,emp:'S2',antt:false,alerta:false},
-  {f:'758',p:'MUI6F52',m:'Ford Transit 410 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:165,cap:15,emp:'S2',antt:false,alerta:false},
-  {f:'Caminhão',p:'ORE2H18',m:'VW 15.190 CRM 4X2',cat:'Caminhão',mot:'MAN D0834',cv:186,cap:3,emp:'S2',antt:false,alerta:false},
-  {f:'Saveiro',p:'QLF8656',m:'VW Nova Saveiro',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:104,cap:2,emp:'S2',antt:false,alerta:false},
-  {f:'Virtus 1',p:'QWK5075',m:'VW Virtus MF 1.6',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:117,cap:5,emp:'S2',antt:false,alerta:false},
-  {f:'Virtus 2',p:'TNO4B08',m:'VW Virtus Sense 1.0T',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,emp:'S2',antt:false,alerta:false},
-  {f:'Virtus 3',p:'TNO8A97',m:'VW Virtus Sense 1.0T',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,emp:'S2',antt:false,alerta:false},
-  {f:'Voyage',p:'QLC6185',m:'VW Novo Voyage TL',cat:'Carro / utilitário',mot:'VW EA211 1.0 MPI',cv:82,cap:5,emp:'S2',antt:false,alerta:false},
+  {f:'701',p:'QLA2804',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:'2015',emp:'W2S',antt:false},
+  {f:'702',p:'QLA3654',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:'2015',emp:'W2S',antt:false},
+  {f:'703',p:'TNQ7G21',m:'Toyota Hiace DX Pass',cat:'Van',mot:'Toyota 1GD-FTV',cv:148,cap:15,ano:'2024',emp:'S2',antt:true},
+  {f:'704',p:'QLM0046',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,ano:'2018',emp:'S2',antt:false},
+  {f:'706',p:'NMI9338',m:'Volare W9 ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:26,ano:'2011',emp:'W2S',antt:true},
+  {f:'707',p:'NML2278',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 904 LA',cv:150,cap:26,ano:'2011',emp:'S2',antt:false},
+  {f:'708',p:'NMA4755',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:42,ano:'2008',emp:'S2',antt:false},
+  {f:'709',p:'QLL9886',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,ano:'2018',emp:'S2',antt:false},
+  {f:'710',p:'NMI0278',m:'Volare W9 ON',cat:'Micro-ônibus',mot:'MWM 4.12 TCE',cv:150,cap:26,ano:'2011',emp:'S2',antt:false},
+  {f:'711',p:'NLZ5794',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,ano:'2009',emp:'S2',antt:false},
+  {f:'712',p:'NLZ5824',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,ano:'2009',emp:'S2',antt:false},
+  {f:'713',p:'SAD3F04',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,ano:'2021',emp:'W2S',antt:false},
+  {f:'714',p:'SAD2D24',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,ano:'2021',emp:'W2S',antt:false},
+  {f:'715',p:'QLM0136',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,ano:'2018',emp:'S2',antt:false},
+  {f:'716',p:'MUN7648',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:'2006',emp:'S2',antt:false},
+  {f:'717A',p:'OHB6701',m:'MB/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:47,ano:'2011',emp:'S2',antt:false},
+  {f:'717B',p:'TNT0I72',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,ano:'2025',emp:'S2',antt:true},
+  {f:'718A',p:'OHC5201',m:'MB/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:47,ano:'2011',emp:'S2',antt:false},
+  {f:'718B',p:'TNT0I62',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,ano:'2025',emp:'S2',antt:true},
+  {f:'719',p:'NMD2991',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:360,cap:52,ano:'2009',emp:'S2',antt:false},
+  {f:'720',p:'QWH1694',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019',emp:'S2',antt:false},
+  {f:'722',p:'QWH1654',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019',emp:'W2S',antt:false},
+  {f:'723',p:'QWH1684',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019',emp:'W2S',antt:false},
+  {f:'725',p:'OHH2647',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:'2013',emp:'S2',antt:false},
+  {f:'727',p:'ORI2153',m:'VW/Voyage TL MCV',cat:'Carro / utilitário',mot:'VW EA211 1.0 MPI',cv:82,cap:5,ano:'2016',emp:'S2',antt:false},
+  {f:'728',p:'SAA9F61',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:381,cap:48,ano:'2023',emp:'S2',antt:true},
+  {f:'729',p:'SAA0D22',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:'2020',emp:'S2',antt:false},
+  {f:'730',p:'OHG5463',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:42,ano:'2013',emp:'S2',antt:true},
+  {f:'731',p:'SAF9F70',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,ano:'2021',emp:'S2',antt:false},
+  {f:'732',p:'QLD4730',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:45,ano:'2015',emp:'S2',antt:false},
+  {f:'733',p:'QLA3664',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:'2015',emp:'S2',antt:false},
+  {f:'734',p:'SAB8H95',m:'Hyundai HB20S',cat:'Carro / utilitário',mot:'Hyundai Kappa 1.0',cv:80,cap:5,ano:'2022',emp:'S2',antt:false},
+  {f:'735',p:'QLL9846',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,ano:'2018',emp:'S2',antt:false},
+  {f:'736',p:'QLE6489',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:'2015',emp:'S2',antt:false},
+  {f:'737',p:'QLE6499',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:'2015',emp:'S2',antt:false},
+  {f:'738',p:'QLG6648',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:'2015',emp:'S2',antt:true},
+  {f:'739',p:'QLG6688',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:'2015',emp:'S2',antt:true},
+  {f:'740',p:'QWG4207',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:'2019',emp:'S2',antt:false},
+  {f:'741',p:'QLH4597',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,ano:'2015',emp:'W2S',antt:false},
+  {f:'742',p:'QLF3186',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,ano:'2015',emp:'S2',antt:false},
+  {f:'743',p:'QLF3296',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,ano:'2015',emp:'S2',antt:false},
+  {f:'744',p:'QLJ4866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,ano:'2018',emp:'S2',antt:false},
+  {f:'745',p:'QLL9866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:20,ano:'2018',emp:'S2',antt:false},
+  {f:'746',p:'QLL8530',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,ano:'2017',emp:'W2S',antt:false},
+  {f:'747',p:'QLM2981',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,ano:'2017',emp:'W2S',antt:false},
+  {f:'748',p:'QLI9485',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:'2017',emp:'S2',antt:true},
+  {f:'749',p:'QLJ5397',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:30,ano:'2018',emp:'S2',antt:true},
+  {f:'750',p:'QLI9475',m:'MB/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:354,cap:50,ano:'2017',emp:'S2',antt:true},
+  {f:'751',p:'QTT4691',m:'Scania/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:400,cap:48,ano:'2018',emp:'S2',antt:true},
+  {f:'752',p:'QWG3260',m:'Scania/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:360,cap:48,ano:'2019',emp:'S2',antt:true},
+  {f:'753',p:'QWG4177',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:'2019',emp:'W2S',antt:false},
+  {f:'754',p:'QWG4187',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:'2019',emp:'W2S',antt:false},
+  {f:'755',p:'SAI5H68',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,ano:'2022',emp:'S2',antt:false},
+  {f:'756',p:'SAI1D18',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,ano:'2022',emp:'S2',antt:false},
+  {f:'757',p:'TNJ1J49',m:'Volare V8L MO',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:157,cap:19,ano:'2024',emp:'S2',antt:false},
+  {f:'758',p:'MUI6F52',m:'Ford Transit 410 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:165,cap:15,ano:'2023',emp:'S2',antt:false},
+  {f:'Caminhão',p:'ORE2H18',m:'VW 15.190 CRM 4X2',cat:'Caminhão',mot:'MAN D0834',cv:186,cap:3,ano:'2014',emp:'S2',antt:false},
+  {f:'Saveiro',p:'QLF8656',m:'VW Nova Saveiro',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:104,cap:2,ano:'2017',emp:'S2',antt:false},
+  {f:'Virtus 1',p:'QWK5075',m:'VW Virtus MF 1.6',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:117,cap:5,ano:'2019',emp:'S2',antt:false},
+  {f:'Virtus 2',p:'TNO4B08',m:'VW Virtus Sense 1.0T',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,ano:'2025',emp:'S2',antt:false},
+  {f:'Virtus 3',p:'TNO8A97',m:'VW Virtus Sense 1.0T',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,ano:'2025',emp:'S2',antt:false},
+  {f:'Voyage',p:'QLC6185',m:'VW Novo Voyage TL',cat:'Carro / utilitário',mot:'VW EA211 1.0 MPI',cv:82,cap:5,ano:'2016',emp:'S2',antt:false},
 ];
 
 const catBadge={
@@ -207,14 +288,13 @@ const catBadge={
   'Caminhão':'<span class="badge b-cam">Caminhão</span>',
 };
 
-let activeCat='';
-
 // KPIs
-document.getElementById('k-rod').textContent=FROTA.filter(v=>v.cat==='Ônibus rodoviário').length;
-document.getElementById('k-micro').textContent=FROTA.filter(v=>v.cat==='Micro-ônibus').length;
-document.getElementById('k-van').textContent=FROTA.filter(v=>v.cat==='Van').length;
-document.getElementById('k-car').textContent=FROTA.filter(v=>v.cat==='Carro / utilitário').length;
+document.getElementById('k-rod').textContent  = FROTA.filter(v=>v.cat==='Ônibus rodoviário').length;
+document.getElementById('k-micro').textContent = FROTA.filter(v=>v.cat==='Micro-ônibus').length;
+document.getElementById('k-van').textContent   = FROTA.filter(v=>v.cat==='Van').length;
+document.getElementById('k-car').textContent   = FROTA.filter(v=>v.cat==='Carro / utilitário').length;
 
+let activeCat='';
 
 function setCat(el,cat){
   activeCat=cat;
@@ -222,15 +302,16 @@ function setCat(el,cat){
   el.classList.add('active');
   render();
 }
-
 function clearSearch(){
   document.getElementById('q').value='';
   render();
 }
-
 function render(){
   const q=document.getElementById('q').value.toLowerCase().trim();
   let data=FROTA.filter(v=>{
+    if(activeCat==='antt') return v.antt;
+    if(activeCat==='W2S') return v.emp==='W2S';
+    if(activeCat==='S2')  return v.emp==='S2';
     if(activeCat && v.cat!==activeCat) return false;
     if(!q) return true;
     return v.f.toLowerCase().includes(q)||v.p.toLowerCase().includes(q)||
@@ -238,7 +319,7 @@ function render(){
   });
   const tbody=document.getElementById('tbody');
   if(!data.length){
-    tbody.innerHTML='<tr><td colspan="9" class="no-results">Nenhum veículo encontrado para essa busca.</td></tr>';
+    tbody.innerHTML='<tr><td colspan="10" class="no-results">Nenhum veículo encontrado.</td></tr>';
   } else {
     tbody.innerHTML=data.map(v=>`<tr>
       <td class="frota-num">${v.f}</td>
@@ -246,9 +327,11 @@ function render(){
       <td>${v.m}</td>
       <td>${catBadge[v.cat]||v.cat}</td>
       <td class="motor-tag">${v.mot}</td>
-      <td class="dim">${v.cv} cv</td>
+      <td class="dim">${v.cv}</td>
       <td class="dim">${v.cap}P</td>
-      <td class="dim">${v.emp}</td><td>${v.antt?'<span class="badge b-antt">ANTT</span>':''}</td>
+      <td class="dim">${v.ano}</td>
+      <td class="dim">${v.emp}</td>
+      <td>${v.antt?'<span class="badge b-antt">ANTT</span>':''}</td>
     </tr>`).join('');
   }
   document.getElementById('count').textContent=`${data.length} de ${FROTA.length} veículos`;
