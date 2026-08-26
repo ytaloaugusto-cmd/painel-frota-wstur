@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Garagem WS — Painel da Frota</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --ws-navy:#0F417E;--ws-blue:#005790;--ws-blue-2:#007CBD;
-  --ws-cyan:#05B6DD;--ws-green:#60AD34;
-  --bg:#08203F;--surface:#0C2C54;--surface-2:#103666;
-  --ring:rgba(255,255,255,0.12);--ring-strong:rgba(255,255,255,0.22);
-  --ink:#FFFFFF;--ink-2:#C6D3E6;--muted:#8CA0BE;--grid:#1B3A63;
-  --s1:#12A0C0;--s2:#63A836;--s3:#2E86C9;--s4:#BB7E13;--s5:#D163A0;--s6:#8B79E6;
-  --ok:#3BC24A;--warn:#FAB219;--serious:#EC835A;--critical:#F0564F;
+  --ws-navy:#0F417E; --ws-navy-deep:#0a2c56; --ws-blue:#005790;
+  --ws-blue-2:#007CBD; --ws-cyan:#05B6DD; --ws-green:#60AD34;
+  --ws-green-2:#8FC74A; --ws-white:#FFFFFF;
+  --bg:#08203F; --surface:#0C2C54; --surface-2:#103666;
+  --ring:rgba(255,255,255,0.12); --ring-strong:rgba(255,255,255,0.22);
+  --ink:#FFFFFF; --ink-2:#C6D3E6; --muted:#8CA0BE; --grid:#1B3A63;
+  --s1:#12A0C0; --s2:#63A836; --s3:#2E86C9; --s4:#BB7E13; --s5:#D163A0; --s6:#8B79E6;
+  --ok:#3BC24A; --warn:#FAB219; --serious:#EC835A; --critical:#F0564F;
   --font:"Barlow Semi Condensed",system-ui,sans-serif;
   --font-cond:"Barlow Condensed","Barlow Semi Condensed",system-ui,sans-serif;
   --radius:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;height:100%}
+
+/* ── HEADER ── */
 .site-header{position:sticky;top:0;z-index:30;background:linear-gradient(90deg,#06182F 0%,var(--ws-navy) 55%,var(--ws-blue-2) 100%);border-bottom:1px solid var(--ring-strong);box-shadow:0 2px 24px rgba(0,0,0,.6)}
 .site-header .bar{max-width:1200px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:16px}
 .site-header img{height:52px;width:auto}
@@ -31,20 +34,30 @@ html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-
 .spacer{flex:1}
 .env{font-size:.72rem;color:var(--ink-2);border:1px solid var(--ring);padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.03);white-space:nowrap}
 .accent-strip{height:3px;background:linear-gradient(90deg,var(--ws-navy),var(--ws-blue) 35%,var(--ws-cyan) 65%,var(--ws-green))}
+
+/* ── ABAS ── */
 .tab-bar{background:var(--surface);border-bottom:1px solid var(--grid);position:sticky;top:78px;z-index:20}
 .tab-bar ul{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;gap:2px;list-style:none}
 .tab-bar li button{font-family:var(--font-cond);font-size:.88rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:12px 18px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;display:flex;align-items:center;gap:7px}
 .tab-bar li button:hover{color:var(--ink-2)}
 .tab-bar li button.active{color:var(--ws-cyan);border-bottom-color:var(--ws-cyan)}
+
+/* ── WRAP ── */
 .wrap{max-width:1200px;margin:0 auto;padding:24px 24px 80px}
+
+/* ── SEÇÃO ── */
 h2.section{font-family:var(--font-cond);font-size:.9rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--ws-cyan);font-weight:700;margin:32px 0 14px}
+
+/* ── KPIs ── */
 .kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:24px}
 .kpi{background:var(--surface);border:1px solid var(--ring);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
 .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent,var(--ws-cyan))}
 .kpi .k-label{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px}
-.kpi .k-val{font-family:var(--font-cond);font-size:2.2rem;font-weight:700;line-height:1}
+.kpi .k-val{font-family:var(--font-cond);font-size:2.2rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 .kpi .k-sub{font-size:.75rem;color:var(--ink-2);margin-top:5px}
 @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── FILTROS ── */
 .filter-card{background:var(--surface);border:1px solid var(--ring);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 .search-row{display:flex;gap:8px;align-items:center}
 .sw{position:relative;flex:1}
@@ -58,10 +71,12 @@ h2.section{font-family:var(--font-cond);font-size:.9rem;text-transform:uppercase
 .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:999px;border:1px solid var(--ring);background:transparent;color:var(--muted);font-size:.76rem;font-family:var(--font);font-weight:600;cursor:pointer;transition:all .15s;user-select:none}
 .chip:hover{border-color:var(--ws-cyan);color:var(--ws-cyan)}
 .chip.active{background:rgba(5,182,221,.12);border-color:var(--ws-cyan);color:var(--ws-cyan)}
+
+/* ── TABELA ── */
 .tbl-card{background:var(--surface);border:1px solid var(--ring);border-radius:var(--radius);overflow:hidden}
 table.tbl{width:100%;border-collapse:collapse;font-size:.86rem}
 table.tbl th{background:rgba(0,0,0,.25);color:var(--muted);font-weight:600;padding:9px 12px;text-align:left;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--grid);font-family:var(--font-cond);white-space:nowrap}
-table.tbl td{padding:9px 12px;border-bottom:1px solid var(--grid);vertical-align:middle}
+table.tbl td{padding:9px 12px;border-bottom:1px solid var(--grid);vertical-align:middle;font-variant-numeric:tabular-nums}
 table.tbl tr:last-child td{border-bottom:none}
 table.tbl tr.clickable{cursor:pointer}
 table.tbl tr.clickable:hover td{background:var(--surface-2)}
@@ -70,6 +85,8 @@ table.tbl tr.clickable:hover td{background:var(--surface-2)}
 .dim{color:var(--muted);font-size:.8rem}
 .mot{color:var(--ink-2);font-size:.8rem}
 .no-results{text-align:center;padding:3rem;color:var(--muted)}
+
+/* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;font-size:.72rem;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid transparent;font-family:var(--font-cond);letter-spacing:.04em}
 .b-rod{color:#7DD6EE;background:rgba(18,160,192,.15);border-color:rgba(18,160,192,.3)}
 .b-micro{color:#A0D870;background:rgba(99,168,54,.15);border-color:rgba(99,168,54,.3)}
@@ -77,16 +94,20 @@ table.tbl tr.clickable:hover td{background:var(--surface-2)}
 .b-car{color:#E6BE70;background:rgba(187,126,19,.15);border-color:rgba(187,126,19,.3)}
 .b-cam{color:#E898CC;background:rgba(209,99,160,.15);border-color:rgba(209,99,160,.3)}
 .b-antt{color:#B0E070;background:rgba(96,173,52,.18);border-color:rgba(96,173,52,.4);letter-spacing:.06em}
+
+/* ── GRÁFICOS ── */
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 @media(max-width:700px){.chart-grid{grid-template-columns:1fr}}
 .chart-card{background:var(--surface);border:1px solid var(--ring);border-radius:var(--radius);padding:20px 22px}
 .chart-title{font-size:.95rem;font-weight:600;margin-bottom:2px}
 .chart-sub{color:var(--muted);font-size:.78rem;margin-bottom:14px}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.bar-label{font-size:.78rem;color:var(--ink-2);width:140px;text-align:right;flex-shrink:0}
-.bar-track{flex:1;background:var(--grid);border-radius:4px;height:14px;overflow:hidden}
+.bar-label{font-size:.78rem;color:var(--ink-2);width:130px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;background:var(--grid);border-radius:4px;height:14px;position:relative;overflow:hidden}
 .bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
-.bar-val{font-size:.76rem;font-weight:600;width:28px;flex-shrink:0}
+.bar-val{font-size:.76rem;font-weight:600;color:var(--ink);width:28px;flex-shrink:0;font-variant-numeric:tabular-nums}
+
+/* ── MANUTENÇÃO ── */
 .manut-card{background:var(--surface);border:1px solid var(--ring);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
 table.manut{width:100%;border-collapse:collapse;font-size:.82rem}
 table.manut th{background:rgba(0,0,0,.25);color:var(--muted);font-weight:600;padding:9px 12px;text-align:left;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--grid);font-family:var(--font-cond)}
@@ -95,8 +116,8 @@ table.manut tr:last-child td{border-bottom:none}
 table.manut tr:hover td{background:var(--surface-2)}
 table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
 .note-bar{background:var(--surface-2);border:1px solid var(--ring);border-left:3px solid var(--ws-green);border-radius:10px;padding:12px 16px;font-size:.82rem;color:var(--ink-2);margin-top:16px}
-.vendidos-card{background:var(--surface);border:1px solid rgba(240,86,79,.3);border-radius:var(--radius);overflow:hidden;margin-top:24px}
-.vendidos-header{background:rgba(240,86,79,.12);padding:10px 16px;font-size:.78rem;font-weight:600;color:#F0564F;font-family:var(--font-cond);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid rgba(240,86,79,.2)}
+
+/* ── DRAWER ── */
 .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
 .drawer-overlay.open{opacity:1;pointer-events:all}
 .drawer{position:fixed;top:0;right:0;bottom:0;width:420px;max-width:95vw;background:var(--surface);border-left:1px solid var(--ring-strong);z-index:50;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:0 0 40px}
@@ -104,7 +125,7 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
 .drawer-head{position:sticky;top:0;background:linear-gradient(90deg,#06182F,var(--ws-navy));border-bottom:1px solid var(--ring-strong);padding:14px 18px;display:flex;align-items:center;gap:12px}
 .drawer-head .dh-frota{font-family:var(--font-cond);font-size:1.4rem;font-weight:700;color:var(--ws-cyan)}
 .drawer-head .dh-modelo{font-size:.82rem;color:var(--ink-2);margin-top:2px}
-.drawer-close{margin-left:auto;background:none;border:1px solid var(--ring);border-radius:8px;color:var(--muted);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:1.1rem}
+.drawer-close{margin-left:auto;background:none;border:1px solid var(--ring);border-radius:8px;color:var(--muted);font-size:1.1rem;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .drawer-close:hover{border-color:var(--ws-cyan);color:var(--ws-cyan)}
 .drawer-body{padding:18px}
 .drawer-section{margin-bottom:20px}
@@ -118,7 +139,11 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
 .manut-item:last-child{border-bottom:none}
 .manut-item .mi-label{color:var(--muted)}
 .manut-item .mi-val{color:var(--ink);font-weight:600;text-align:right}
+
+/* ── FOOTER ── */
 .footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--grid);color:var(--muted);font-size:.76rem;display:flex;justify-content:space-between}
+
+/* ── TABS PANEL ── */
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 /* ── OCORRÊNCIAS (O.S.) — escopado em #tab-ocorrencias p/ não colidir com as outras abas ── */
@@ -221,6 +246,8 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
 </style>
 </head>
 <body>
+
+<!-- HEADER -->
 <header class="site-header">
   <div class="bar">
     <img src="data:image/png;base64,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" alt="WS Receptivo">
@@ -229,10 +256,12 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
       <div class="t2">W2S Locação · S2 Turismo · Maceió / AL</div>
     </div>
     <div class="spacer"></div>
-    <div class="env" id="env-total">64 veículos &nbsp;·&nbsp; ago / 2026</div>
+    <div class="env">64 veículos &nbsp;·&nbsp; ago / 2026</div>
   </div>
   <div class="accent-strip"></div>
 </header>
+
+<!-- ABAS -->
 <nav class="tab-bar">
   <ul>
     <li><button class="active" onclick="showTab('inventario',this)">
@@ -245,7 +274,7 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
     </button></li>
     <li><button onclick="showTab('manutencao',this)">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      Manutenção Preventiva
+      Manutenção
     </button></li>
     <li><button onclick="showTab('ocorrencias',this)">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -253,28 +282,37 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
     </button></li>
   </ul>
 </nav>
+
+<!-- DRAWER OVERLAY -->
 <div class="drawer-overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- DRAWER -->
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <div><div class="dh-frota" id="d-frota">—</div><div class="dh-modelo" id="d-modelo">—</div></div>
+    <div>
+      <div class="dh-frota" id="d-frota">—</div>
+      <div class="dh-modelo" id="d-modelo">—</div>
+    </div>
     <button class="drawer-close" onclick="closeDrawer()">✕</button>
   </div>
   <div class="drawer-body" id="drawer-body"></div>
 </div>
+
 <div class="wrap">
 
-<!-- INVENTÁRIO -->
+<!-- ═══════════ ABA: INVENTÁRIO ═══════════ -->
 <div class="tab-panel active" id="tab-inventario">
   <h2 class="section">Resumo da frota</h2>
   <div class="kpi-grid">
-    <div class="kpi" style="--accent:var(--ws-cyan)"><div class="k-label">Total ativo</div><div class="k-val" style="color:var(--ws-cyan)" id="k-total">—</div><div class="k-sub">veículos</div></div>
-    <div class="kpi" style="--accent:var(--s1)"><div class="k-label">Rodoviário</div><div class="k-val" style="color:var(--s1)" id="k-rod">—</div><div class="k-sub">ônibus</div></div>
-    <div class="kpi" style="--accent:var(--s2)"><div class="k-label">Micro-ônibus</div><div class="k-val" style="color:var(--s2)" id="k-micro">—</div><div class="k-sub">unidades</div></div>
-    <div class="kpi" style="--accent:var(--s3)"><div class="k-label">Van</div><div class="k-val" style="color:var(--s3)" id="k-van">—</div><div class="k-sub">unidades</div></div>
-    <div class="kpi" style="--accent:var(--s4)"><div class="k-label">Carros</div><div class="k-val" style="color:var(--s4)" id="k-car">—</div><div class="k-sub">utilitários</div></div>
-    <div class="kpi" style="--accent:var(--ws-green)"><div class="k-label">ANTT</div><div class="k-val" style="color:var(--ws-green)" id="k-antt">—</div><div class="k-sub">registrados</div></div>
+    <div class="kpi" style="--accent:var(--ws-cyan)"><div class="k-label">Total</div><div class="k-val" style="color:var(--ws-cyan)">64</div><div class="k-sub">veículos ativos</div></div>
+    <div class="kpi" style="--accent:var(--s1)"><div class="k-label">Rodoviário</div><div class="k-val" style="color:'var(--s1)'" id="k-rod">—</div><div class="k-sub">ônibus</div></div>
+    <div class="kpi" style="--accent:var(--s2)"><div class="k-label">Micro-ônibus</div><div class="k-val" style="color:'var(--s2)'" id="k-micro">—</div><div class="k-sub">unidades</div></div>
+    <div class="kpi" style="--accent:var(--s3)"><div class="k-label">Van</div><div class="k-val" style="color:'var(--s3)'" id="k-van">—</div><div class="k-sub">unidades</div></div>
+    <div class="kpi" style="--accent:var(--s4)"><div class="k-label">Carros</div><div class="k-val" style="color:'var(--s4)'" id="k-car">—</div><div class="k-sub">utilitários</div></div>
+    <div class="kpi" style="--accent:var(--ws-green)"><div class="k-label">ANTT</div><div class="k-val" style="color:var(--ws-green)">13</div><div class="k-sub">registrados</div></div>
   </div>
-  <h2 class="section">Inventário — clique na frota para ver a ficha técnica</h2>
+
+  <h2 class="section">Inventário — clique numa frota para ver a ficha técnica</h2>
   <div class="filter-card">
     <div class="search-row">
       <div class="sw">
@@ -290,7 +328,7 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
         Rodoviário
       </button>
       <button class="chip" onclick="setCat(this,'Micro-ônibus')">
-        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M2 11h20M6 19v2M18 19v2"/></svg>
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M2 11h20M6 19v2M18 19v2"/><circle cx="7" cy="14" r="1" fill="currentColor"/><circle cx="17" cy="14" r="1" fill="currentColor"/></svg>
         Micro-ônibus
       </button>
       <button class="chip" onclick="setCat(this,'Van')">
@@ -318,60 +356,71 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
       <tbody id="tbody"></tbody>
     </table>
   </div>
-  <div class="vendidos-card">
-    <div class="vendidos-header">Veículos vendidos / baixados</div>
-    <table class="tbl">
-      <thead><tr><th>Frota</th><th>Placa</th><th>Modelo</th><th>Chassi</th><th>Renavam</th><th>Situação</th></tr></thead>
-      <tbody>
-        <tr><td class="mono">718A</td><td><span class="placa">OHC5201</span></td><td>M.Benz/Comil Campione R</td><td class="dim" style="font-family:monospace;font-size:.75rem">9BM382176CB837785</td><td class="dim">00451383940</td><td class="dim">Vendido</td></tr>
-        <tr><td class="mono">Gunga</td><td><span class="placa">QLI4054</span></td><td>VW/Voyage 1.0L MC4</td><td class="dim" style="font-family:monospace;font-size:.75rem">9BWDG45UXKT006878</td><td class="dim">01156692536</td><td class="dim">Vendido</td></tr>
-        <tr><td class="mono">HB20 ant.</td><td><span class="placa">SAB8H85</span></td><td>Hyundai/HB20S 1.0M Vision</td><td class="dim" style="font-family:monospace;font-size:.75rem">9BHCP41AANP301107</td><td class="dim">01298686420</td><td class="dim">Vendido</td></tr>
-        <tr><td class="mono">Voyage</td><td><span class="placa">QLC6185</span></td><td>VW/Novo Voyage TL MCV</td><td class="dim" style="font-family:monospace;font-size:.75rem">9BWDG45U9HT029917</td><td class="dim">01093789074</td><td class="dim">Vendido</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="footer"><span id="count"></span><span>Fonte: CRLV Detran-AL · WS Receptivo ago/2026</span></div>
+  <div class="footer"><span id="count"></span><span>Fonte: CRLV Detran-AL · WS Receptivo 2026</span></div>
 </div>
 
-<!-- GRÁFICOS -->
+<!-- ═══════════ ABA: GRÁFICOS ═══════════ -->
 <div class="tab-panel" id="tab-graficos">
   <h2 class="section">Distribuição da frota</h2>
   <div class="chart-grid">
-    <div class="chart-card"><div class="chart-title">Por categoria</div><div class="chart-sub">64 veículos ativos</div><div id="chart-cat"></div></div>
-    <div class="chart-card"><div class="chart-title">Famílias de motor</div><div class="chart-sub">nº de veículos</div><div id="chart-mot"></div></div>
+    <div class="chart-card">
+      <div class="chart-title">Por categoria</div>
+      <div class="chart-sub">64 veículos ativos</div>
+      <div id="chart-cat"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Principais famílias de motor</div>
+      <div class="chart-sub">nº de veículos</div>
+      <div id="chart-mot"></div>
+    </div>
   </div>
   <div class="chart-grid">
-    <div class="chart-card"><div class="chart-title">Por empresa</div><div class="chart-sub">W2S vs S2</div><div id="chart-emp"></div></div>
-    <div class="chart-card"><div class="chart-title">Registro ANTT / RNTRC</div><div class="chart-sub">habilitados para transporte rodoviário</div><div id="chart-antt"></div></div>
+    <div class="chart-card">
+      <div class="chart-title">Por empresa</div>
+      <div class="chart-sub">W2S vs S2</div>
+      <div id="chart-emp"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Registro ANTT</div>
+      <div class="chart-sub">veículos habilitados para transporte rodoviário</div>
+      <div id="chart-antt"></div>
+    </div>
   </div>
 </div>
 
-<!-- MANUTENÇÃO -->
+<!-- ═══════════ ABA: MANUTENÇÃO ═══════════ -->
 <div class="tab-panel" id="tab-manutencao">
   <h2 class="section">Referência de manutenção preventiva por motor</h2>
   <div class="manut-card">
     <table class="manut">
-      <thead><tr><th>Motor</th><th>Frotas</th><th>Óleo / Spec</th><th>Viscosidade</th><th>Intervalo</th><th>Filtro óleo</th><th>Filtro comb.</th><th>Filtro ar</th><th>Arla 32</th></tr></thead>
+      <thead><tr>
+        <th>Motor</th><th>Frotas</th><th>Óleo / Spec</th><th>Viscosidade</th>
+        <th>Intervalo</th><th>Filtro óleo</th><th>Filtro comb.</th><th>Filtro ar</th><th>Arla 32</th>
+      </tr></thead>
       <tbody>
-        <tr><td>MB OM 457/460 LA</td><td class="dim">719, 728, 750</td><td>MB 228.5</td><td>10W-40</td><td>30.000 km</td><td class="dim">Mann W1374</td><td class="dim">Mann WK1080</td><td class="dim">Mann C30850</td><td>Sim (Euro V/VI)</td></tr>
-        <tr><td>MB OM 926 LA</td><td class="dim">708,716,717A,725,730,732,736–739,748</td><td>MB 228.5</td><td>10W-40</td><td>20.000 km</td><td class="dim">Mann W11102/48</td><td class="dim">Mann WK1168</td><td class="dim">Mann C30850/2</td><td>Não</td></tr>
-        <tr><td>MB OM 924 LA</td><td class="dim">701,702,705,707,713,714,721,731,733,741,742,743</td><td>MB 228.51</td><td>10W-40</td><td>30.000 km</td><td class="dim">Mann W11102/35</td><td class="dim">Mann WK820/16</td><td class="dim">Mann C30850/3</td><td>Sim (Euro VI)</td></tr>
+        <tr><td>MB OM 457/460 LA</td><td class="dim">719, 728, 750</td><td>MB 228.5</td><td>10W-40</td><td>30.000 km</td><td class="dim">Mann W1374</td><td class="dim">Mann WK1080</td><td class="dim">Mann C30850</td><td>Sim (Euro V)</td></tr>
+        <tr><td>MB OM 926 LA</td><td class="dim">708,716,717A,718A,725,730,732,736–739,748</td><td>MB 228.5</td><td>10W-40</td><td>20.000 km</td><td class="dim">Mann W11102/48</td><td class="dim">Mann WK1168</td><td class="dim">Mann C30850/2</td><td>Não</td></tr>
+        <tr><td>MB OM 924 LA</td><td class="dim">701,702,713,714,731,733,741,742,743</td><td>MB 228.51</td><td>10W-40</td><td>30.000 km</td><td class="dim">Mann W11102/35</td><td class="dim">Mann WK820/16</td><td class="dim">Mann C30850/3</td><td>Sim</td></tr>
         <tr><td>MB OM 906 LA</td><td class="dim">711, 712</td><td>MB 228.5</td><td>10W-40</td><td>20.000 km</td><td class="dim">Mann W11102/42</td><td class="dim">Mann WK1080</td><td class="dim">Mann C30850</td><td>Não</td></tr>
         <tr><td>MB OM 904 LA</td><td class="dim">707</td><td>MB 228.5</td><td>10W-40</td><td>20.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Não</td></tr>
-        <tr><td>Cummins ISF 3.8</td><td class="dim">704,706,709,715,720,722,723,729,735,740,744–747,749,753,754,757</td><td>API CK-4</td><td>15W-40</td><td>15.000 km</td><td class="dim">Fleetguard LF16015</td><td class="dim">Fleetguard FF63009</td><td class="dim">Fleetguard AF25557</td><td>Sim</td></tr>
-        <tr><td>Scania DC09</td><td class="dim">751, 752</td><td>Scania LDF-4</td><td>10W-40</td><td>60.000 km</td><td class="dim">Scania 1858905</td><td class="dim">Scania 2139455</td><td class="dim">Scania 2113101</td><td>Sim</td></tr>
-        <tr><td>MAN D0836</td><td class="dim">717B, 718</td><td>MAN M3477</td><td>10W-40</td><td>60.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Sim</td></tr>
+        <tr><td>Cummins ISF 3.8 (Fly 10)</td><td class="dim">706,720,722,723,729,740,746,747,749,753,754,757</td><td>API CK-4</td><td>15W-40</td><td>15.000 km</td><td class="dim">Fleetguard LF16015</td><td class="dim">Fleetguard FF63009</td><td class="dim">Fleetguard AF25557</td><td>Sim</td></tr>
+        <tr><td>Cummins ISF 2.8 (Fly 6)</td><td class="dim">704,709,715,735,744,745</td><td>API CK-4*</td><td>15W-40*</td><td>15.000 km*</td><td class="dim">a confirmar</td><td class="dim">a confirmar</td><td class="dim">a confirmar</td><td>Sim</td></tr>
+        <tr><td>Scania DC13</td><td class="dim">751, 752</td><td>Scania LDF-4*</td><td>10W-40*</td><td>60.000 km*</td><td class="dim">a confirmar</td><td class="dim">a confirmar</td><td class="dim">a confirmar</td><td>Sim</td></tr>
+        <tr><td>MAN D0836</td><td class="dim">717B, 718B</td><td>MAN M3477</td><td>10W-40</td><td>60.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Sim</td></tr>
         <tr><td>MAN D0834</td><td class="dim">Caminhão</td><td>MAN M3275</td><td>10W-40</td><td>30.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Não</td></tr>
         <tr><td>Ford EcoBlue 2.0</td><td class="dim">755, 756, 758</td><td>Ford WSS-M2C950-A</td><td>5W-30</td><td>15.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Sim</td></tr>
-        <tr><td>Toyota 1GD-FTV</td><td class="dim">703, 745A</td><td>Toyota 0W-30</td><td>0W-30</td><td>10.000 km</td><td class="dim">04152-YZZA6</td><td class="dim">23390-0L070</td><td class="dim">17801-0L070</td><td>Sim</td></tr>
+        <tr><td>Toyota 1GD-FTV</td><td class="dim">703</td><td>Toyota 0W-30</td><td>0W-30</td><td>10.000 km</td><td class="dim">04152-YZZA6</td><td class="dim">23390-0L070</td><td class="dim">17801-0L070</td><td>Sim</td></tr>
         <tr><td>MWM 4.12 TCE</td><td class="dim">710</td><td>API CJ-4</td><td>15W-40</td><td>15.000 km</td><td class="dim">Fram PH6607A</td><td class="dim">MWM 93903143</td><td class="dim">MWM 93904063</td><td>Não</td></tr>
-        <tr><td>VW EA211 (flex)</td><td class="dim">724, 726, 727, 734, 759, Saveiro</td><td>API SP</td><td>5W-30</td><td>10.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Não</td></tr>
-        <tr><td>GM LFW 1.8</td><td class="dim">726, 727</td><td>API SP</td><td>5W-30</td><td>10.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Não</td></tr>
-        <tr><td>Hyundai Kappa 1.0</td><td class="dim">HB20</td><td>API SP</td><td>5W-30</td><td>10.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Não</td></tr>
+        <tr><td>VW EA211 (flex)</td><td class="dim">727,Saveiro,Virtus 1/2/3,Voyage</td><td>API SP</td><td>5W-30</td><td>10.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Não</td></tr>
+        <tr><td>Hyundai Kappa 1.0</td><td class="dim">734</td><td>API SP</td><td>5W-30</td><td>10.000 km</td><td class="dim">—</td><td class="dim">—</td><td class="dim">—</td><td>Não</td></tr>
       </tbody>
     </table>
   </div>
-  <div class="note-bar">⚠ <strong>Atenção:</strong> MB 228.31 ≠ MB 228.5 ≠ MB 228.51 — não intercambiar entre motores Mercedes-Benz. Scania LDF-2 ≠ LDF-3 ≠ LDF-4. API CK-4 aprovado para Cummins ISF 3.8 mas <strong>não substitui</strong> MB 228.5/228.51 nos motores Mercedes.</div>
+  <div class="note-bar">
+    ⚠ <strong>Atenção:</strong> MB 228.31 ≠ MB 228.5 ≠ MB 228.51 — não intercambiar entre motores Mercedes-Benz.
+    Scania LDF-2 ≠ LDF-3 ≠ LDF-4. API CK-4 aprovado para Cummins ISF 3.8 mas <strong>não substitui</strong>
+    MB 228.5/228.51 nos motores Mercedes.
+  </div>
 </div>
 <!-- ═══════════ ABA: OCORRÊNCIAS (O.S.) ═══════════ -->
 <div class="tab-panel" id="tab-ocorrencias">
@@ -478,74 +527,78 @@ table.manut td:first-child{color:var(--ink);font-weight:600;white-space:nowrap}
     </div>
   </div>
 </div>
-</div>
+
+</div><!-- /wrap -->
 
 <script>
+/* ════════════════════════════════════════
+   DADOS DA FROTA
+════════════════════════════════════════ */
 const FROTA=[
-  {f:'701',p:'QLA2804',m:'Marcopolo/Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:'2015',emp:'S2 Turismo',antt:false,chas:'93PB49P31FS500115',renavam:'01088047278',cil:'4,8L 4-cil',torq:'570 Nm',euro:'Euro V',cambio:'ZF 6HP604',pbt:'8.500 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'702',p:'QLA3654',m:'Marcopolo/Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:'2015',emp:'S2 Turismo',antt:false,chas:'93PB49P31FS500120',renavam:'01088170827',cil:'4,8L 4-cil',torq:'570 Nm',euro:'Euro V',cambio:'ZF 6HP604',pbt:'8.500 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'703',p:'TNQ7G21',m:'I/Toyota Hiace Pass DX',cat:'Van',mot:'Toyota 1GD-FTV',cv:148,cap:16,ano:'2025/2026',emp:'S2 Turismo',antt:true,chas:'8AJCAHCP5T3000966',renavam:'01489525235',cil:'2,8L 4-cil',torq:'400 Nm',euro:'Euro VI',cambio:'Aut. 6v',pbt:'3.500 kg',oleo:'Toyota 0W-30',interv:'10.000 km'},
-  {f:'704',p:'QLM0046',m:'Marcopolo/Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:19,ano:'2018/2019',emp:'S2 Turismo',antt:false,chas:'93PBA1U3EKS501327',renavam:'01182197849',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'7.200 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'705',p:'SAD5C04',m:'M.Benz/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:48,ano:'2022',emp:'W2S Locação',antt:false,chas:'9BM384078NB257371',renavam:'01299268061',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'706',p:'SAE9H54',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:19,ano:'2022/2023',emp:'S2 Turismo',antt:false,chas:'93PB84S36PC070762',renavam:'01336108379',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro VI',cambio:'Allison 2000',pbt:'7.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'707',p:'NML2278',m:'Marcopolo/Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 904 LA',cv:150,cap:26,ano:'2011',emp:'S2 Turismo',antt:false,chas:'93PB49L31BC036186',renavam:'00351864903',cil:'4,25L 4-cil',torq:'510 Nm',euro:'Euro III',cambio:'Manual 6v',pbt:'8.500 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'708',p:'NMA4755',m:'M.Benz/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:'2008',emp:'S2 Turismo',antt:false,chas:'9BM3821768B594716',renavam:'00980466733',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'709',p:'QLL9886',m:'Marcopolo/Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:19,ano:'2018/2019',emp:'S2 Turismo',antt:false,chas:'93PBA1U3EKS501324',renavam:'01182196508',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'7.200 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'710',p:'NMI0278',m:'Marcopolo/Volare W9 ON',cat:'Micro-ônibus',mot:'MWM 4.12 TCE',cv:150,cap:26,ano:'2011/2012',emp:'S2 Turismo',antt:false,chas:'93PB40E31CC038832',renavam:'00349500231',cil:'4,1L 4-cil',torq:'530 Nm',euro:'Euro III',cambio:'Manual 6v',pbt:'9.000 kg',oleo:'API CJ-4 15W-40',interv:'15.000 km'},
-  {f:'711',p:'NLZ5794',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,ano:'2009',emp:'S2 Turismo',antt:false,chas:'9BM3821859B645920',renavam:'00141774126',cil:'6,4L 6-cil',torq:'1.050 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'712',p:'NLZ5824',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,ano:'2009',emp:'S2 Turismo',antt:false,chas:'9BM3821859B646513',renavam:'00142581496',cil:'6,4L 6-cil',torq:'1.050 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'713',p:'SAD3F04',m:'M.Benz/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:48,ano:'2022',emp:'W2S Locação',antt:false,chas:'9BM384078NB257416',renavam:'01299262489',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'714',p:'SAD2D24',m:'M.Benz/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:48,ano:'2022',emp:'W2S Locação',antt:false,chas:'9BM384078NB257363',renavam:'01299266921',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'715',p:'QLM0136',m:'Marcopolo/Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:19,ano:'2018/2019',emp:'S2 Turismo',antt:false,chas:'93PBA1U3EKS501331',renavam:'01182198462',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'7.200 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'716',p:'MUN7648',m:'M.Benz/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:'2006',emp:'S2 Turismo',antt:false,chas:'9BM3821766B502708',renavam:'00905570189',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'717A',p:'OHB6701',m:'M.Benz/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:46,ano:'2011/2012',emp:'S2 Turismo',antt:false,chas:'9BM382176CB837326',renavam:'00450586715',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'717B',p:'TNT0I72',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:47,ano:'2025/2026',emp:'S2 Turismo',antt:true,chas:'9532F8TU8TR010095',renavam:'01480472058',cil:'6,9L 6-cil',torq:'1.050 Nm',euro:'Euro VI',cambio:'ZF TraXon 12v',pbt:'18.000 kg',oleo:'MAN M3477 10W-40',interv:'60.000 km'},
-  {f:'718',p:'TNT0I62',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:47,ano:'2025/2026',emp:'S2 Turismo',antt:true,chas:'9532F8TU8TR010498',renavam:'01480470845',cil:'6,9L 6-cil',torq:'1.050 Nm',euro:'Euro VI',cambio:'ZF TraXon 12v',pbt:'18.000 kg',oleo:'MAN M3477 10W-40',interv:'60.000 km'},
-  {f:'719',p:'NMD2991',m:'M.Benz/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:360,cap:50,ano:'2009/2010',emp:'S2 Turismo',antt:false,chas:'9BM634011AB672820',renavam:'00194319024',cil:'12,0L 6-cil',torq:'1.800 Nm',euro:'Euro IV',cambio:'ZF Ecosplit 16v',pbt:'27.000 kg',oleo:'MB 228.5 10W-40',interv:'30.000 km'},
-  {f:'720',p:'QWH1694',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019/2020',emp:'S2 Turismo',antt:false,chas:'93PB84S36LS501702',renavam:'01218868080',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'721',p:'SAF9F60',m:'M.Benz/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:48,ano:'2021/2022',emp:'S2 Turismo',antt:false,chas:'9BM384065NB221901',renavam:'01287637237',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'722',p:'QWH1654',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019/2020',emp:'S2 Turismo',antt:false,chas:'93PB84S36LS501711',renavam:'01218867008',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'723',p:'QWH1684',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019/2020',emp:'S2 Turismo',antt:false,chas:'93PB84S36LS501712',renavam:'01218867237',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'724',p:'TNO4B08',m:'VW/Virtus Sense',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:4,ano:'2025/2026',emp:'S2 Turismo',antt:false,chas:'9BWDH6BZ8TP005439',renavam:'01451045740',cil:'1,0L 3-cil',torq:'200 Nm',euro:'Euro VI',cambio:'Aut. 6v',pbt:'1.680 kg',oleo:'API SP 5W-30',interv:'10.000 km'},
-  {f:'725',p:'OHH2647',m:'M.Benz/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:'2013',emp:'S2 Turismo',antt:false,chas:'9BM382177DB899317',renavam:'00568439112',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'726',p:'USC9A82',m:'Chev/Spin 1.8L MT LT',cat:'Carro / utilitário',mot:'GM LFW 1.8',cv:115,cap:4,ano:'2026/2027',emp:'S2 Turismo',antt:false,chas:'9BGJB7520VB112557',renavam:'01501812472',cil:'1,8L 4-cil',torq:'178 Nm',euro:'Euro VI',cambio:'Manual 5v',pbt:'1.560 kg',oleo:'API SP 5W-30',interv:'10.000 km'},
-  {f:'727',p:'USD5G75',m:'Chev/Spin 1.8L MT LT',cat:'Carro / utilitário',mot:'GM LFW 1.8',cv:115,cap:4,ano:'2026/2027',emp:'S2 Turismo',antt:false,chas:'9BGJB7520VB125912',renavam:'01505550464',cil:'1,8L 4-cil',torq:'178 Nm',euro:'Euro VI',cambio:'Manual 5v',pbt:'1.560 kg',oleo:'API SP 5W-30',interv:'10.000 km'},
-  {f:'728',p:'SAA9F61',m:'M.Benz/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:381,cap:46,ano:'2023/2024',emp:'S2 Turismo',antt:true,chas:'9BM634062RB354967',renavam:'01411924409',cil:'12,0L 6-cil',torq:'1.900 Nm',euro:'Euro VI',cambio:'ZF Ecosplit 16v',pbt:'27.000 kg',oleo:'MB 228.5 10W-40',interv:'30.000 km'},
-  {f:'729',p:'SAA0D22',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2020/2021',emp:'S2 Turismo',antt:false,chas:'93PB84S36MC064505',renavam:'01281786109',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'730',p:'OHG5463',m:'M.Benz/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:'2013/2014',emp:'S2 Turismo',antt:true,chas:'9BM382177EB934989',renavam:'01003128910',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'731',p:'SAF9F70',m:'M.Benz/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:48,ano:'2021/2022',emp:'S2 Turismo',antt:false,chas:'9BM384065NB221648',renavam:'01287366942',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'732',p:'QLD4730',m:'M.Benz/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:45,ano:'2015',emp:'S2 Turismo',antt:false,chas:'9BM384065FB009062',renavam:'01074207863',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'733',p:'QLA3664',m:'Marcopolo/Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:'2015',emp:'S2 Turismo',antt:false,chas:'93PB49P31FS500114',renavam:'01088171122',cil:'4,8L 4-cil',torq:'570 Nm',euro:'Euro V',cambio:'ZF 6HP604',pbt:'8.500 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'734',p:'QWK5075',m:'VW/Virtus MF',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:117,cap:4,ano:'2019/2020',emp:'S2 Turismo',antt:false,chas:'9BWDL5BZ4LP084567',renavam:'01217608777',cil:'1,6L 4-cil',torq:'155 Nm',euro:'Euro V',cambio:'Aut. 6v',pbt:'1.690 kg',oleo:'API SP 5W-30',interv:'10.000 km'},
-  {f:'735',p:'QLL9846',m:'Marcopolo/Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:19,ano:'2018/2019',emp:'S2 Turismo',antt:false,chas:'93PBA1U3EKS501326',renavam:'01182195706',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'7.200 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'736',p:'QLE6489',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:46,ano:'2015/2016',emp:'S2 Turismo',antt:false,chas:'9BM382177GB024141',renavam:'01101990977',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'737',p:'QLE6499',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:46,ano:'2015/2016',emp:'S2 Turismo',antt:false,chas:'9BM382177GB024360',renavam:'01101867350',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'738',p:'QLG6648',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:46,ano:'2016/2017',emp:'S2 Turismo',antt:true,chas:'9BM382177GB025123',renavam:'01107505981',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'739',p:'QLG6688',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:46,ano:'2016/2017',emp:'S2 Turismo',antt:true,chas:'9BM382177GB025177',renavam:'01107506449',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'740',p:'QWG4207',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019',emp:'S2 Turismo',antt:false,chas:'93PB84S36KS501390',renavam:'01197474746',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'741',p:'QLH4597',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:44,ano:'2015',emp:'S2 Turismo',antt:false,chas:'9BM384078FB016376',renavam:'01130319498',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'742',p:'QLF3186',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:44,ano:'2015',emp:'S2 Turismo',antt:false,chas:'9BM384078FB016431',renavam:'01127402894',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'743',p:'QLF3296',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:44,ano:'2015',emp:'S2 Turismo',antt:false,chas:'9BM384078FB016378',renavam:'01127403025',cil:'4,8L 4-cil',torq:'810 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'17.000 kg',oleo:'MB 228.51 10W-40',interv:'30.000 km'},
-  {f:'744',p:'QLJ4866',m:'Marcopolo/Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:19,ano:'2018/2019',emp:'S2 Turismo',antt:false,chas:'93PBA1U3EKS501333',renavam:'01182195110',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'7.200 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'745A',p:'USD3I77',m:'I/Toyota Hiace Pass DX',cat:'Van',mot:'Toyota 1GD-FTV',cv:148,cap:16,ano:'2025/2026',emp:'S2 Turismo',antt:false,chas:'8AJCAHCPXT3001191',renavam:'01502574150',cil:'2,8L 4-cil',torq:'400 Nm',euro:'Euro VI',cambio:'Aut. 6v',pbt:'3.500 kg',oleo:'Toyota 0W-30',interv:'10.000 km'},
-  {f:'745B',p:'QLL9866',m:'Marcopolo/Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 3.8',cv:152,cap:19,ano:'2018/2019',emp:'S2 Turismo',antt:false,chas:'93PBA1U3EKS501325',renavam:'01182196176',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'7.200 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'746',p:'QLL8530',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:35,ano:'2017/2018',emp:'S2 Turismo',antt:false,chas:'93PB84S36JS500649',renavam:'01138741105',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'747',p:'QLM2981',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:35,ano:'2017/2018',emp:'S2 Turismo',antt:false,chas:'93PB84S36JC058883',renavam:'01141008871',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'748',p:'QLI9485',m:'M.Benz/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:46,ano:'2017/2018',emp:'S2 Turismo',antt:true,chas:'9BM382177JB087427',renavam:'01160460288',cil:'7,2L 6-cil',torq:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',oleo:'MB 228.5 10W-40',interv:'20.000 km'},
-  {f:'749',p:'QLJ5397',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:28,ano:'2018/2019',emp:'S2 Turismo',antt:true,chas:'93PB84S36KC060078',renavam:'01164686477',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'750',p:'QLI9475',m:'M.Benz/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:354,cap:48,ano:'2017/2018',emp:'S2 Turismo',antt:true,chas:'9BM634061JB077677',renavam:'01160128526',cil:'12,0L 6-cil',torq:'1.800 Nm',euro:'Euro V',cambio:'ZF Ecosplit 16v',pbt:'27.000 kg',oleo:'MB 228.5 10W-40',interv:'30.000 km'},
-  {f:'751',p:'QTT4691',m:'Scania/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:400,cap:46,ano:'2018/2019',emp:'S2 Turismo',antt:true,chas:'9BSK6X200K3942261',renavam:'01185823791',cil:'9,3L 5-cil',torq:'1.900 Nm',euro:'Euro V',cambio:'Scania GRS905R',pbt:'27.000 kg',oleo:'Scania LDF-4 10W-40',interv:'60.000 km'},
-  {f:'752',p:'QWG3260',m:'Scania/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'Scania DC09',cv:360,cap:46,ano:'2019',emp:'S2 Turismo',antt:true,chas:'9BSK6X200K3958112',renavam:'01206933345',cil:'9,3L 5-cil',torq:'1.700 Nm',euro:'Euro V',cambio:'Scania GRS895R',pbt:'27.000 kg',oleo:'Scania LDF-4 10W-40',interv:'60.000 km'},
-  {f:'753',p:'QWG4177',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019',emp:'W2S Locação',antt:false,chas:'93PB84S36KS501388',renavam:'01197474401',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'754',p:'QWG4187',m:'Marcopolo/Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:'2019',emp:'W2S Locação',antt:false,chas:'93PB84S36KS501423',renavam:'01197474614',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro V',cambio:'Allison 2000',pbt:'10.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'755',p:'SAI5H68',m:'I/Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:17,ano:'2022',emp:'S2 Turismo',antt:false,chas:'WF0JTTBE9NU006480',renavam:'01332238715',cil:'2,0L 4-cil',torq:'405 Nm',euro:'Euro VI',cambio:'Aut. 8v',pbt:'5.500 kg',oleo:'Ford WSS-M2C950-A 5W-30',interv:'15.000 km'},
-  {f:'756',p:'SAI1D18',m:'I/Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:17,ano:'2022',emp:'S2 Turismo',antt:false,chas:'WF0JTTBE0NU006495',renavam:'01330711979',cil:'2,0L 4-cil',torq:'405 Nm',euro:'Euro VI',cambio:'Aut. 8v',pbt:'5.500 kg',oleo:'Ford WSS-M2C950-A 5W-30',interv:'15.000 km'},
-  {f:'757',p:'TNJ1J49',m:'Marcopolo/Volare V8L MO',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:157,cap:17,ano:'2024/2025',emp:'S2 Turismo',antt:false,chas:'93PB44A10SS505944',renavam:'01421032799',cil:'3,8L 4-cil',torq:'550 Nm',euro:'Euro VI',cambio:'Allison 2000',pbt:'7.500 kg',oleo:'API CK-4 15W-40',interv:'15.000 km'},
-  {f:'758',p:'MUI6F52',m:'I/Ford Transit 410 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:165,cap:15,ano:'2023/2024',emp:'S2 Turismo',antt:false,chas:'WF0GTTBF9RU013549',renavam:'01410416531',cil:'2,0L 4-cil',torq:'405 Nm',euro:'Euro VI',cambio:'Aut. 8v',pbt:'4.600 kg',oleo:'Ford WSS-M2C950-A 5W-30',interv:'15.000 km'},
-  {f:'759',p:'USD6H92',m:'VW/Virtus AB',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:4,ano:'2026',emp:'S2 Turismo',antt:false,chas:'9BWDH6BZ1T4026747',renavam:'01507418296',cil:'1,0L 3-cil',torq:'200 Nm',euro:'Euro VI',cambio:'Aut. 6v',pbt:'1.680 kg',oleo:'API SP 5W-30',interv:'10.000 km'},
-  {f:'Caminhão',p:'ORE2H18',m:'VW/15.190 CRM 4X2 4P',cat:'Caminhão',mot:'MAN D0834',cv:186,cap:3,ano:'2014/2015',emp:'S2 Turismo',antt:false,chas:'9536E8238FR508038',renavam:'01028137700',cil:'4,58L 4-cil',torq:'700 Nm',euro:'Euro V (P7)',cambio:'Eaton FS 5406-A 6v',pbt:'15.000 kg',oleo:'MAN M3275 10W-40',interv:'30.000 km'},
-  {f:'HB20',p:'SAB8H95',m:'Hyundai/HB20S 1.0M Vision',cat:'Carro / utilitário',mot:'Hyundai Kappa 1.0',cv:80,cap:4,ano:'2022',emp:'S2 Turismo',antt:false,chas:'9BHCP41AANP313139',renavam:'01298685653',cil:'1,0L 3-cil',torq:'96 Nm',euro:'Euro VI',cambio:'Manual 5v',pbt:'1.370 kg',oleo:'API SP 5W-30',interv:'10.000 km'},
-  {f:'Saveiro',p:'QLF8656',m:'VW/Nova Saveiro RB MBVS',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:104,cap:2,ano:'2017/2018',emp:'S2 Turismo',antt:false,chas:'9BWKB45UXJP061263',renavam:'01127818764',cil:'1,6L 4-cil',torq:'155 Nm',euro:'Euro V',cambio:'Manual 5v',pbt:'1.600 kg',oleo:'API SP 5W-30',interv:'10.000 km'}
+  {f:'701',p:'QLA2804',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:2015,emp:'S2',antt:false,chas:'93PB49P31FS500115',renavam:'01088047278',cil:'4,8L 4-cil',torque:'570 Nm',euro:'Euro V',cambio:'ZF 6HP604',pbt:'8.500 kg',arla:false,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'702',p:'QLA3654',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:2015,emp:'S2',antt:false,chas:'93PB49P31FS500120',renavam:'01088170827',cil:'4,8L 4-cil',torque:'570 Nm',euro:'Euro V',cambio:'ZF 6HP604',pbt:'8.500 kg',arla:false,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'703',p:'TNQ7G21',m:'Toyota Hiace DX Pass',cat:'Van',mot:'Toyota 1GD-FTV',cv:148,cap:15,ano:2025,emp:'S2',antt:true,chas:'8AJCAHCP5T3000966',renavam:'01489525235',cil:'2,8L 4-cil',torque:'400 Nm',euro:'Euro VI',cambio:'Aut. 6 marchas',pbt:'3.500 kg',arla:true,oleo:'Toyota 0W-30',interv:'10.000 km'},
+  {f:'704',p:'QLM0046',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 2.8',cv:152,cap:20,ano:2018,emp:'S2',antt:false,chas:'93PBA1U3EKS501327',renavam:'01182197849',cil:'2,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'7.200 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'705',p:'SAD5C04',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:48,ano:2022,emp:'W2S',antt:false,chas:'9BM384078NB257371',renavam:'01299268061',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'706',p:'SAE9H54',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:19,ano:2022,emp:'S2',antt:true,chas:'93PB84S36PC070762',renavam:'01336108379',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro VI',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'707',p:'NML2278',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 904 LA',cv:150,cap:26,ano:2011,emp:'S2',antt:false,chas:'93PB49L31BC036186',renavam:'00351864903',cil:'4,25L 4-cil',torque:'510 Nm',euro:'Euro III',cambio:'Manual 6 marchas',pbt:'8.500 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'708',p:'NMA4755',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:42,ano:2008,emp:'S2',antt:false,chas:'9BM3821768B594716',renavam:'00980466733',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'709',p:'QLL9886',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 2.8',cv:152,cap:20,ano:2018,emp:'S2',antt:false,chas:'93PBA1U3EKS501324',renavam:'01182196508',cil:'2,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'7.200 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'710',p:'NMI0278',m:'Volare W9 ON',cat:'Micro-ônibus',mot:'MWM 4.12 TCE',cv:150,cap:26,ano:2011,emp:'S2',antt:false,chas:'93PB40E31CC038832',renavam:'00349500231',cil:'4,1L 4-cil',torque:'530 Nm',euro:'Euro III',cambio:'Manual 6 marchas',pbt:'9.000 kg',arla:false,oleo:'API CJ-4 15W-40',interv:'15.000 km'},
+  {f:'711',p:'NLZ5794',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,ano:2009,emp:'S2',antt:false,chas:'9BM3821859B645920',renavam:'00141774126',cil:'6,4L 6-cil',torque:'1.050 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'712',p:'NLZ5824',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 906 LA',cv:260,cap:46,ano:2009,emp:'S2',antt:false,chas:'9BM3821859B646513',renavam:'00142581496',cil:'6,4L 6-cil',torque:'1.050 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'713',p:'SAD3F04',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,ano:2022,emp:'W2S',antt:false,chas:'9BM384078NB257416',renavam:'01299262489',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'714',p:'SAD2D24',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,ano:2022,emp:'W2S',antt:false,chas:'9BM384078NB257363',renavam:'01299266921',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'715',p:'QLM0136',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 2.8',cv:152,cap:20,ano:2018,emp:'S2',antt:false,chas:'93PBA1U3EKS501331',renavam:'01182198462',cil:'2,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'7.200 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'716',p:'MUN7648',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:2006,emp:'S2',antt:false,chas:'9BM3821766B502708',renavam:'00905570189',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro III',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'717A',p:'OHB6701',m:'MB/Comil Campione R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:47,ano:2011,emp:'S2',antt:false,chas:'9BM382176CB837326',renavam:'00450586715',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'717B',p:'TNT0I72',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,ano:2025,emp:'S2',antt:true,chas:'9532F8TU8TR010095',renavam:'01480472058',cil:'6,9L 6-cil',torque:'1.050 Nm',euro:'Euro VI',cambio:'ZF TraXon 12v',pbt:'18.000 kg',arla:true,oleo:'MAN M3477 10W-40',interv:'60.000 km'},
+  {f:'718',p:'TNT0I62',m:'VW/Mpolo VG GVIII R',cat:'Ônibus rodoviário',mot:'MAN D0836',cv:260,cap:48,ano:2025,emp:'S2',antt:true,chas:'9532F8TU8TR010498',renavam:'01480470845',cil:'6,9L 6-cil',torque:'1.050 Nm',euro:'Euro VI',cambio:'ZF TraXon 12v',pbt:'18.000 kg',arla:true,oleo:'MAN M3477 10W-40',interv:'60.000 km'},
+  {f:'719',p:'NMD2991',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:360,cap:52,ano:2009,emp:'S2',antt:false,chas:'9BM634011AB672820',renavam:'00194319024',cil:'12,0L 6-cil',torque:'1.800 Nm',euro:'Euro IV',cambio:'ZF Ecosplit 16v',pbt:'27.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'30.000 km'},
+  {f:'720',p:'QWH1694',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:2019,emp:'S2',antt:false,chas:'93PB84S36LS501702',renavam:'01218868080',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'721',p:'SAF9F60',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:48,ano:2021,emp:'S2',antt:false,chas:'9BM384065NB221901',renavam:'01287637237',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'722',p:'QWH1654',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:2019,emp:'S2',antt:false,chas:'93PB84S36LS501711',renavam:'01218867008',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'723',p:'QWH1684',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:34,ano:2019,emp:'S2',antt:false,chas:'93PB84S36LS501712',renavam:'01218867237',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'724',p:'TNO4B08',m:'VW Virtus Sense 1.0T',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,ano:2025,emp:'S2',antt:false,chas:'9BWDH6BZ8TP005439',renavam:'01451045740',cil:'1,0L 3-cil',torque:'200 Nm',euro:'Euro VI',cambio:'Aut. 6 marchas',pbt:'1.680 kg',arla:false,oleo:'API SP 5W-30',interv:'10.000 km'},
+  {f:'725',p:'OHH2647',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:305,cap:50,ano:2013,emp:'S2',antt:false,chas:'9BM382177DB899317',renavam:'00568439112',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'726',p:'USC9A82',m:'Chevrolet Spin 1.8 LT',cat:'Carro / utilitário',mot:'GM 1.8 SPE/4*',cv:111,cap:5,ano:2026,emp:'S2',antt:false,chas:'9BGJB7520VB112557',renavam:'01501812472',cil:'1,8L 4-cil',torque:'177 Nm',euro:'Euro VI',cambio:'Aut. 6 marchas',pbt:'1.800 kg',arla:false,oleo:'API SP 5W-30',interv:'10.000 km'},
+  {f:'727',p:'USD5G75',m:'Chevrolet Spin 1.8 LT',cat:'Carro / utilitário',mot:'GM 1.8 SPE/4*',cv:111,cap:5,ano:2026,emp:'S2',antt:false,chas:'9BGJB7520VB125912',renavam:'01505550464',cil:'1,8L 4-cil',torque:'177 Nm',euro:'Euro VI',cambio:'Aut. 6 marchas',pbt:'1.800 kg',arla:false,oleo:'API SP 5W-30',interv:'10.000 km'},
+  {f:'728',p:'SAA9F61',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:381,cap:48,ano:2023,emp:'S2',antt:true,chas:'9BM634062RB354967',renavam:'01411924409',cil:'12,0L 6-cil',torque:'1.900 Nm',euro:'Euro VI',cambio:'ZF Ecosplit 16v',pbt:'27.000 kg',arla:true,oleo:'MB 228.5 10W-40',interv:'30.000 km'},
+  {f:'729',p:'SAA0D22',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:2020,emp:'S2',antt:false,chas:'93PB84S36MC064505',renavam:'01281786109',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'730',p:'OHG5463',m:'MB/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:42,ano:2013,emp:'S2',antt:true,chas:'9BM382177EB934989',renavam:'01003128910',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'731',p:'SAF9F70',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:49,ano:2021,emp:'S2',antt:false,chas:'9BM384065NB221648',renavam:'01287366942',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro VI',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'732',p:'QLD4730',m:'MB/Mpolo Ideale R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:45,ano:2015,emp:'S2',antt:false,chas:'9BM384065FB009062',renavam:'01074207863',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'733',p:'QLA3664',m:'Volare DW9 ON',cat:'Micro-ônibus',mot:'MB OM 924 LA',cv:156,cap:31,ano:2015,emp:'S2',antt:false,chas:'93PB49P31FS500114',renavam:'01088171122',cil:'4,8L 4-cil',torque:'570 Nm',euro:'Euro V',cambio:'ZF 6HP604',pbt:'8.500 kg',arla:false,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'734',p:'QWK5075',m:'VW Virtus MF 1.6',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:117,cap:5,ano:2019,emp:'S2',antt:false,chas:'9BWDL5BZ4LP084567',renavam:'01217608777',cil:'1,6L 4-cil',torque:'155 Nm',euro:'Euro V',cambio:'Aut. 6 marchas',pbt:'1.690 kg',arla:false,oleo:'API SP 5W-30',interv:'10.000 km'},
+  {f:'735',p:'QLL9846',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 2.8',cv:152,cap:20,ano:2018,emp:'S2',antt:false,chas:'93PBA1U3EKS501326',renavam:'01182195706',cil:'2,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'7.200 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'736',p:'QLE6489',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:2015,emp:'S2',antt:false,chas:'9BM382177GB024141',renavam:'01101990977',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'737',p:'QLE6499',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:2015,emp:'S2',antt:false,chas:'9BM382177GB024360',renavam:'01101867350',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'738',p:'QLG6648',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:2016,emp:'S2',antt:true,chas:'9BM382177GB025123',renavam:'01107505981',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'739',p:'QLG6688',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:2016,emp:'S2',antt:true,chas:'9BM382177GB025177',renavam:'01107506449',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'740',p:'QWG4207',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:2019,emp:'S2',antt:false,chas:'93PB84S36KS501390',renavam:'01197474746',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'741',p:'QLH4597',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,ano:2015,emp:'S2',antt:false,chas:'9BM384078FB016376',renavam:'01130319498',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'742',p:'QLF3186',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,ano:2015,emp:'S2',antt:false,chas:'9BM384078FB016431',renavam:'01127402894',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'743',p:'QLF3296',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 924 LA',cv:208,cap:45,ano:2015,emp:'S2',antt:false,chas:'9BM384078FB016378',renavam:'01127403025',cil:'4,8L 4-cil',torque:'810 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'17.000 kg',arla:true,oleo:'MB 228.51 10W-40',interv:'30.000 km'},
+  {f:'744',p:'QLJ4866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 2.8',cv:152,cap:20,ano:2018,emp:'S2',antt:false,chas:'93PBA1U3EKS501333',renavam:'01182195110',cil:'2,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'7.200 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'745B',p:'USD3I77',m:'Toyota Hiace DX Pass',cat:'Van',mot:'Toyota 1GD-FTV',cv:148,cap:15,ano:2025,emp:'S2',antt:false,chas:'8AJCAHCPXT3001191',renavam:'01502574150',cil:'2,8L 4-cil',torque:'400 Nm',euro:'Euro VI',cambio:'Aut. 6 marchas',pbt:'3.500 kg',arla:true,oleo:'Toyota 0W-30',interv:'10.000 km'},
+  {f:'745A',p:'QLL9866',m:'Volare Cinco EXM',cat:'Van',mot:'Cummins ISF 2.8',cv:152,cap:20,ano:2018,emp:'S2',antt:false,chas:'93PBA1U3EKS501325',renavam:'01182196176',cil:'2,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'7.200 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'746',p:'QLL8530',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,ano:2017,emp:'S2',antt:false,chas:'93PB84S36JS500649',renavam:'01138741105',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'747',p:'QLM2981',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:37,ano:2017,emp:'S2',antt:false,chas:'93PB84S36JC058883',renavam:'01141008871',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'748',p:'QLI9485',m:'MB/Mpolo Viaggio R',cat:'Ônibus rodoviário',mot:'MB OM 926 LA',cv:310,cap:48,ano:2017,emp:'S2',antt:true,chas:'9BM382177JB087427',renavam:'01160460288',cil:'7,2L 6-cil',torque:'1.200 Nm',euro:'Euro V',cambio:'G211-12 Manual',pbt:'18.000 kg',arla:false,oleo:'MB 228.5 10W-40',interv:'20.000 km'},
+  {f:'749',p:'QLJ5397',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:30,ano:2018,emp:'S2',antt:true,chas:'93PB84S36KC060078',renavam:'01164686477',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'750',p:'QLI9475',m:'MB/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'MB OM 457/460 LA',cv:354,cap:50,ano:2017,emp:'S2',antt:true,chas:'9BM634061JB077677',renavam:'01160128526',cil:'12,0L 6-cil',torque:'1.800 Nm',euro:'Euro V',cambio:'ZF Ecosplit 16v',pbt:'27.000 kg',arla:true,oleo:'MB 228.5 10W-40',interv:'30.000 km'},
+  {f:'751',p:'QTT4691',m:'Scania/Mpolo Paradiso LD',cat:'Ônibus rodoviário',mot:'Scania DC13',cv:400,cap:48,ano:2018,emp:'S2',antt:true,chas:'9BSK6X200K3942261',renavam:'01185823791',cil:'12,7L 6-cil',torque:'1.900 Nm*',euro:'Euro V (P7)',cambio:'Scania GRS895R',pbt:'27.000 kg',arla:true,oleo:'Scania LDF-4 10W-40*',interv:'60.000 km'},
+  {f:'752',p:'QWG3260',m:'Scania/Mpolo Paradiso R',cat:'Ônibus rodoviário',mot:'Scania DC13',cv:360,cap:48,ano:2019,emp:'S2',antt:true,chas:'9BSK6X200K3958112',renavam:'01206933345',cil:'12,7L 6-cil',torque:'1.700 Nm*',euro:'Euro V (P7)',cambio:'Scania GRS895R',pbt:'27.000 kg',arla:true,oleo:'Scania LDF-4 10W-40*',interv:'60.000 km'},
+  {f:'753',p:'QWG4177',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:2019,emp:'W2S',antt:false,chas:'93PB84S36KS501388',renavam:'01197474401',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'754',p:'QWG4187',m:'Volare W-L ON',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:162,cap:36,ano:2019,emp:'W2S',antt:false,chas:'93PB84S36KS501423',renavam:'01197474614',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro V',cambio:'Allison 2000 Aut.',pbt:'10.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'755',p:'SAI5H68',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,ano:2022,emp:'S2',antt:false,chas:'WF0JTTBE9NU006480',renavam:'01332238715',cil:'2,0L 4-cil',torque:'405 Nm',euro:'Euro VI',cambio:'Aut. 8 marchas',pbt:'5.500 kg',arla:true,oleo:'Ford WSS-M2C950-A 5W-30',interv:'15.000 km'},
+  {f:'756',p:'SAI1D18',m:'Ford Transit 460 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:170,cap:18,ano:2022,emp:'S2',antt:false,chas:'WF0JTTBE0NU006495',renavam:'01330711979',cil:'2,0L 4-cil',torque:'405 Nm',euro:'Euro VI',cambio:'Aut. 8 marchas',pbt:'5.500 kg',arla:true,oleo:'Ford WSS-M2C950-A 5W-30',interv:'15.000 km'},
+  {f:'757',p:'TNJ1J49',m:'Volare V8L MO',cat:'Micro-ônibus',mot:'Cummins ISF 3.8',cv:157,cap:19,ano:2024,emp:'S2',antt:false,chas:'93PB44A10SS505944',renavam:'01421032799',cil:'3,8L 4-cil',torque:'550 Nm',euro:'Euro VI',cambio:'Allison 2000 Aut.',pbt:'7.500 kg',arla:true,oleo:'API CK-4 15W-40',interv:'15.000 km'},
+  {f:'758',p:'MUI6F52',m:'Ford Transit 410 B',cat:'Van',mot:'Ford EcoBlue 2.0',cv:165,cap:15,ano:2023,emp:'S2',antt:false,chas:'WF0GTTBF9RU013549',renavam:'01410416531',cil:'2,0L 4-cil',torque:'405 Nm',euro:'Euro VI',cambio:'Aut. 8 marchas',pbt:'4.600 kg',arla:true,oleo:'Ford WSS-M2C950-A 5W-30',interv:'15.000 km'},
+  {f:'759',p:'USD6H92',m:'VW Virtus 1.0 TSI',cat:'Carro / utilitário',mot:'VW EA211 1.0 TSI',cv:116,cap:5,ano:2026,emp:'S2',antt:false,chas:'9BWDH6BZ1T4026747',renavam:'01507418296',cil:'1,0L 3-cil',torque:'200 Nm',euro:'Euro VI',cambio:'Aut. 6 marchas',pbt:'1.680 kg',arla:false,oleo:'API SP 5W-30',interv:'10.000 km'},
+  {f:'Caminhão',p:'ORE2H18',m:'VW 15.190 CRM 4X2',cat:'Caminhão',mot:'MAN D0834',cv:186,cap:3,ano:2014,emp:'S2',antt:false,chas:'9536E8238FR508038',renavam:'01028137700',cil:'4,58L 4-cil',torque:'700 Nm',euro:'Euro V (P7)',cambio:'Eaton FS 5406-A 6v',pbt:'15.000 kg',arla:false,oleo:'MAN M3275 10W-40',interv:'30.000 km'},
+  {f:'HB20',p:'SAB8H95',m:'Hyundai HB20S',cat:'Carro / utilitário',mot:'Hyundai Kappa 1.0',cv:80,cap:5,ano:2022,emp:'S2',antt:false,chas:'9BHCP41AANP313139',renavam:'01298685653',cil:'1,0L 3-cil',torque:'96 Nm',euro:'Euro VI',cambio:'Man. 5 marchas',pbt:'1.370 kg',arla:false,oleo:'API SP 5W-30',interv:'10.000 km'},
+  {f:'Saveiro',p:'QLF8656',m:'VW Nova Saveiro',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:104,cap:2,ano:2017,emp:'S2',antt:false,chas:'9BWKB45UXJP061263',renavam:'01127818764',cil:'1,6L 4-cil',torque:'155 Nm',euro:'Euro V',cambio:'Man. 5 marchas',pbt:'1.600 kg',arla:false,oleo:'API SP 5W-30',interv:'10.000 km'},
 ];
 
 const catBadge={
@@ -556,13 +609,13 @@ const catBadge={
   'Caminhão':'<span class="badge b-cam">Caminhão</span>',
 };
 
-document.getElementById('k-total').textContent = FROTA.length;
-document.getElementById('k-rod').textContent   = FROTA.filter(v=>v.cat==='Ônibus rodoviário').length;
+/* ── KPIs ── */
+document.getElementById('k-rod').textContent  = FROTA.filter(v=>v.cat==='Ônibus rodoviário').length;
 document.getElementById('k-micro').textContent = FROTA.filter(v=>v.cat==='Micro-ônibus').length;
 document.getElementById('k-van').textContent   = FROTA.filter(v=>v.cat==='Van').length;
 document.getElementById('k-car').textContent   = FROTA.filter(v=>v.cat==='Carro / utilitário').length;
-document.getElementById('k-antt').textContent  = FROTA.filter(v=>v.antt).length;
 
+/* ── ABAS ── */
 function showTab(id,btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
@@ -571,6 +624,8 @@ function showTab(id,btn){
   if(id==='graficos') renderCharts();
   if(id==='ocorrencias' && window.ocRenderCharts) window.ocRenderCharts();
 }
+
+/* ── FILTRO TABELA ── */
 let activeCat='';
 function setCat(el,cat){
   activeCat=cat;
@@ -583,8 +638,8 @@ function renderTable(){
   const q=document.getElementById('q').value.toLowerCase().trim();
   let data=FROTA.filter(v=>{
     if(activeCat==='antt') return v.antt;
-    if(activeCat==='W2S') return v.emp.includes('W2S');
-    if(activeCat==='S2')  return v.emp.includes('S2');
+    if(activeCat==='W2S') return v.emp==='W2S';
+    if(activeCat==='S2')  return v.emp==='S2';
     if(activeCat && v.cat!==activeCat) return false;
     if(!q) return true;
     return v.f.toLowerCase().includes(q)||v.p.toLowerCase().includes(q)||
@@ -603,28 +658,29 @@ function renderTable(){
     <td class="dim">${v.emp}</td>
     <td>${v.antt?'<span class="badge b-antt">ANTT</span>':''}</td>
   </tr>`).join(''):'<tr><td colspan="10" class="no-results">Nenhum veículo encontrado.</td></tr>';
-  document.getElementById('count').textContent=`${data.length} de ${FROTA.length} veículos ativos`;
+  document.getElementById('count').textContent=`${data.length} de ${FROTA.length} veículos`;
 }
 renderTable();
 
+/* ── DRAWER ── */
 function openDrawer(frota){
   const v=FROTA.find(x=>x.f===frota);
   if(!v) return;
   document.getElementById('d-frota').textContent='Frota '+v.f;
-  document.getElementById('d-modelo').textContent=v.m+' · '+v.ano+' · '+v.emp;
+  document.getElementById('d-modelo').textContent=v.m+' — '+v.ano+' · '+v.emp;
   document.getElementById('drawer-body').innerHTML=`
     <div class="drawer-section">
       <div class="drawer-section-title">Identificação</div>
       <div class="spec-grid">
         <div class="spec-item"><div class="spec-label">Placa</div><div class="spec-val">${v.p}</div></div>
         <div class="spec-item"><div class="spec-label">Categoria</div><div class="spec-val">${v.cat}</div></div>
-        <div class="spec-item"><div class="spec-label">Empresa</div><div class="spec-val">${v.emp}</div></div>
-        <div class="spec-item"><div class="spec-label">Ano</div><div class="spec-val">${v.ano}</div></div>
+        <div class="spec-item"><div class="spec-label">Empresa</div><div class="spec-val">${v.emp==='W2S'?'W2S Locação de Veículos':'S2 Turismo'}</div></div>
+        <div class="spec-item"><div class="spec-label">Ano fab./mod.</div><div class="spec-val">${v.ano}</div></div>
         <div class="spec-item full"><div class="spec-label">Chassi</div><div class="spec-val" style="font-family:monospace;font-size:.82rem">${v.chas}</div></div>
         <div class="spec-item full"><div class="spec-label">Renavam</div><div class="spec-val" style="font-family:monospace;font-size:.82rem">${v.renavam}</div></div>
         <div class="spec-item"><div class="spec-label">ANTT / RNTRC</div><div class="spec-val">${v.antt?'✓ Registrado':'— Não registrado'}</div></div>
         <div class="spec-item"><div class="spec-label">Capacidade</div><div class="spec-val">${v.cap} passageiros</div></div>
-        <div class="spec-item"><div class="spec-label">PBT</div><div class="spec-val">${v.pbt}</div></div>
+        <div class="spec-item"><div class="spec-label">PBT homologado</div><div class="spec-val">${v.pbt}</div></div>
       </div>
     </div>
     <div class="drawer-section">
@@ -633,10 +689,10 @@ function openDrawer(frota){
         <div class="spec-item full"><div class="spec-label">Motor</div><div class="spec-val">${v.mot}</div></div>
         <div class="spec-item"><div class="spec-label">Potência</div><div class="spec-val">${v.cv} cv</div></div>
         <div class="spec-item"><div class="spec-label">Cilindrada</div><div class="spec-val">${v.cil}</div></div>
-        <div class="spec-item"><div class="spec-label">Torque máx.</div><div class="spec-val">${v.torq}</div></div>
+        <div class="spec-item"><div class="spec-label">Torque máx.</div><div class="spec-val">${v.torque}</div></div>
         <div class="spec-item"><div class="spec-label">Emissões</div><div class="spec-val">${v.euro}</div></div>
         <div class="spec-item full"><div class="spec-label">Câmbio</div><div class="spec-val">${v.cambio}</div></div>
-        <div class="spec-item"><div class="spec-label">Arla 32</div><div class="spec-val">${v.antt||v.euro.includes('VI')||v.euro.includes('V')?'Sim (SCR)':'Não'}</div></div>
+        <div class="spec-item"><div class="spec-label">Arla 32</div><div class="spec-val">${v.arla?'Sim (SCR)':'Não'}</div></div>
       </div>
     </div>
     <div class="drawer-section">
@@ -654,6 +710,7 @@ function closeDrawer(){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape') closeDrawer();});
 
+/* ── GRÁFICOS ── */
 let chartsRendered=false;
 function renderCharts(){
   if(chartsRendered) return;
@@ -663,21 +720,25 @@ function renderCharts(){
     {label:'Micro-ônibus',count:FROTA.filter(v=>v.cat==='Micro-ônibus').length,color:'var(--s2)'},
     {label:'Van',count:FROTA.filter(v=>v.cat==='Van').length,color:'var(--s3)'},
     {label:'Carro/util.',count:FROTA.filter(v=>v.cat==='Carro / utilitário').length,color:'var(--s4)'},
-    {label:'Caminhão',count:1,color:'var(--s5)'},
+    {label:'Caminhão',count:FROTA.filter(v=>v.cat==='Caminhão').length,color:'var(--s5)'},
   ];
   const mots=[
-    {label:'Cummins ISF 3.8',count:FROTA.filter(v=>v.mot==='Cummins ISF 3.8').length,color:'var(--s1)'},
-    {label:'MB OM 926 LA',count:FROTA.filter(v=>v.mot==='MB OM 926 LA').length,color:'var(--s2)'},
-    {label:'MB OM 924 LA',count:FROTA.filter(v=>v.mot==='MB OM 924 LA').length,color:'var(--s3)'},
-    {label:'MB OM 457/460 LA',count:FROTA.filter(v=>v.mot==='MB OM 457/460 LA').length,color:'var(--s4)'},
-    {label:'Ford EcoBlue 2.0',count:FROTA.filter(v=>v.mot==='Ford EcoBlue 2.0').length,color:'var(--s5)'},
-    {label:'Scania DC09',count:FROTA.filter(v=>v.mot==='Scania DC09').length,color:'var(--s6)'},
-    {label:'MAN D0836',count:FROTA.filter(v=>v.mot==='MAN D0836').length,color:'var(--s1)'},
-    {label:'Toyota 1GD-FTV',count:FROTA.filter(v=>v.mot==='Toyota 1GD-FTV').length,color:'var(--s2)'},
+    {label:'Cummins ISF 3.8',count:12,color:'var(--s1)'},
+    {label:'MB OM 924 LA',count:11,color:'var(--s2)'},
+    {label:'Cummins ISF 2.8',count:6,color:'var(--s6)'},
+    {label:'MB OM 926 LA',count:11,color:'var(--s3)'},
+    {label:'VW EA211 (flex)',count:4,color:'var(--s4)'},
+    {label:'MB OM 457/460 LA',count:3,color:'var(--s5)'},
+    {label:'Ford EcoBlue 2.0',count:3,color:'var(--s6)'},
+    {label:'Toyota 1GD-FTV',count:2,color:'var(--s1)'},
+    {label:'MB OM 906 LA',count:2,color:'var(--s2)'},
+    {label:'MAN D0836',count:2,color:'var(--s3)'},
+    {label:'GM 1.8 SPE/4',count:2,color:'var(--s1)'},
+    {label:'Scania DC13',count:2,color:'var(--s2)'},
   ];
   const emps=[
-    {label:'S2 Turismo',count:FROTA.filter(v=>v.emp.includes('S2')).length,color:'var(--s1)'},
-    {label:'W2S Locação',count:FROTA.filter(v=>v.emp.includes('W2S')).length,color:'var(--s3)'},
+    {label:'S2 Turismo',count:FROTA.filter(v=>v.emp==='S2').length,color:'var(--s1)'},
+    {label:'W2S Locação',count:FROTA.filter(v=>v.emp==='W2S').length,color:'var(--s3)'},
   ];
   const antts=[
     {label:'Com ANTT',count:FROTA.filter(v=>v.antt).length,color:'var(--ws-green)'},
@@ -689,7 +750,8 @@ function renderCharts(){
   renderBarChart('chart-antt',antts,antts[0].count);
 }
 function renderBarChart(id,data,max){
-  document.getElementById(id).innerHTML=data.map(d=>`
+  const el=document.getElementById(id);
+  el.innerHTML=data.map(d=>`
     <div class="bar-row">
       <div class="bar-label">${d.label}</div>
       <div class="bar-track"><div class="bar-fill" style="width:${Math.round(d.count/max*100)}%;background:${d.color}"></div></div>
@@ -877,5 +939,6 @@ render();
 })();
 
 </script>
+
 </body>
 </html>
