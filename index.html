@@ -615,6 +615,72 @@ const FROTA=[
   {f:'HB20',p:'SAB8H95',m:'Hyundai/HB20S 1.0M Vision',cat:'Carro / utilitário',mot:'Hyundai Kappa 1.0',cv:80,cap:4,ano:'2022',emp:'S2 Turismo',antt:false,chas:'9BHCP41AANP313139',renavam:'01298685653',cil:'1,0L 3-cil',torq:'96 Nm',euro:'Euro VI',cambio:'Manual 5v',pbt:'1.370 kg',oleo:'API SP 5W-30',interv:'10.000 km'},
   {f:'Saveiro',p:'QLF8656',m:'VW/Nova Saveiro RB MBVS',cat:'Carro / utilitário',mot:'VW EA211 1.6 MSI',cv:104,cap:2,ano:'2017/2018',emp:'S2 Turismo',antt:false,chas:'9BWKB45UXJP061263',renavam:'01127818764',cil:'1,6L 4-cil',torq:'155 Nm',euro:'Euro V',cambio:'Manual 5v',pbt:'1.600 kg',oleo:'API SP 5W-30',interv:'10.000 km'}
 ];
+const CADASTRO={
+  "701":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"10085544143",fin:"SEM RESERVA DE DOMINIO"},
+  "702":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"73406192582",fin:"SEM RESERVA DE DOMINIO"},
+  "703":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"53615705916",fin:"BENEF. TRIBUTARIO 2/4/27"},
+  "704":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"38409665166",fin:"BANCO DO NORDESTE"},
+  "705":{plot:"CVC",cor:"AMARELO",prop:"W2S LOCAÇÃO DE VEÍCULOS LTDA EPP",crv:"89005718017",fin:"BANCO MONEO S/A"},
+  "706":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"48201514387",fin:"ALIENAÇÃO FIDUCIÁRIA"},
+  "707":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"13606118473",fin:"SEM RESERVA DE DOMINIO"},
+  "708":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"15042810885",fin:"SEM RESERVA DE DOMINIO"},
+  "709":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"68684227208",fin:"BANCO DO NORDESTE"},
+  "710":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"14856261325",fin:"SEM RESERVA DE DOMINIO"},
+  "711":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"40788741337",fin:"SEM RESERVA DE DOMINIO"},
+  "712":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"60807544094",fin:"SEM RESERVA DE DOMINIO"},
+  "713":{plot:"CVC",cor:"AMARELO",prop:"W2S LOCAÇÃO DE VEÍCULOS LTDA EPP",crv:"89454805719",fin:"BANCO MONEO S/A"},
+  "714":{plot:"CVC",cor:"AMARELO",prop:"W2S LOCAÇÃO DE VEÍCULOS LTDA EPP",crv:"43189522959",fin:"BANCO MONEO S/A"},
+  "715":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"07355844506",fin:"BANCO DO NORDESTE"},
+  "716":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"81106561668",fin:"SEM RESERVA DE DOMINIO"},
+  "717A":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"36410038234",fin:"ITAU UNIBANCO S A"},
+  "717B":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA",crv:"97561113061",fin:"ALIENAÇÃO FIDUCIÁRIA"},
+  "718":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"48131093210",fin:"ALIENAÇÃO FIDUCIÁRIA"},
+  "719":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"17702831653",fin:"SEM RESERVA DE DOMINIO"},
+  "720":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"80841588911",fin:"SEM RESERVA DE DOMINIO"},
+  "721":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"64481697783",fin:"ALIENAÇÃO FIDUCIÁRIA"},
+  "722":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"25826787892",fin:"SEM RESERVA DE DOMINIO"},
+  "723":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"66144110125",fin:"SEM RESERVA DE DOMINIO"},
+  "724":{plot:"BRANCO",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"09845614464",fin:"CONVENIO ICMS 22-07-2026"},
+  "725":{plot:"+ALAGOAS",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"55663638126",fin:"SEM RESERVA DE DOMINIO"},
+  "726":{plot:"CVC",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"85943611366",fin:"CONVENIO ICMS 30-06-27"},
+  "727":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"66425001559",fin:"CONVENIO ICMS 31-07-27"},
+  "728":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"36273784350",fin:"ALIENAÇÃO FIDUCIÁRIA"},
+  "729":{plot:"+ALAGOAS",cor:"PRATA",prop:"S2 TURISMO LTDA",crv:"00561416674",fin:"BANCO MONEO S/A"},
+  "730":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"66013903581",fin:"SEM RESERVA DE DOMINIO"},
+  "731":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"32968845571",fin:"ALIENAÇÃO FIDUCIÁRIA"},
+  "732":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"85091040557",fin:"SEM RESERVA DE DOMINIO"},
+  "733":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"26481761784",fin:"SEM RESERVA DE DOMINIO"},
+  "734":{plot:"BRANCO",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"55640900644",fin:"SEM RESERVA DE DOMINIO"},
+  "735":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"66765684562",fin:"BANCO DO NORDESTE"},
+  "736":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA",crv:"48187209653",fin:"SEM RESERVA DE DOMINIO"},
+  "737":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA",crv:"16761630915",fin:"SEM RESERVA DE DOMINIO"},
+  "738":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"57119825065",fin:"BANCO MONEO S/A"},
+  "739":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"92879167114",fin:"BANCO MONEO S/A"},
+  "740":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"98448705591",fin:"SEM RESERVA DE DOMINIO"},
+  "741":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"15669523954",fin:"SEM RESERVA DE DOMINIO"},
+  "742":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"26865568056",fin:"SEM RESERVA DE DOMINIO"},
+  "743":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"18092593251",fin:"SEM RESERVA DE DOMINIO"},
+  "744":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"77583111450",fin:"BANCO DO NORDESTE"},
+  "745A":{plot:"CVC",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"53855855386",fin:"CONVENIO ICMS 11-6-27"},
+  "745B":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"80570686295",fin:"BANCO DO NORDESTE"},
+  "746":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"15851050685",fin:"SEM RESERVA DE DOMINIO"},
+  "747":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"11173623881",fin:"SEM RESERVA DE DOMINIO"},
+  "748":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"93838880164",fin:"BANCO MERCEDES-BENZ"},
+  "749":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"86643611989",fin:"BANCO BRADESCO"},
+  "750":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"45201065447",fin:"BANCO MERCEDES-BENZ"},
+  "751":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA EPP",crv:"24049340066",fin:"BANCO MONEO S/A"},
+  "752":{plot:"CVC",cor:"AMARELO",prop:"S2 TURISMO LTDA",crv:"40000866711",fin:"BANCO MONEO S/A"},
+  "753":{plot:"+ALAGOAS",cor:"BRANCO",prop:"W2S LOCAÇÃO DE VEÍCULOS LTDA EPP",crv:"64157686206",fin:"BANCO MONEO S/A"},
+  "754":{plot:"WS TUR",cor:"BRANCO",prop:"W2S LOCAÇÃO DE VEÍCULOS LTDA EPP",crv:"84748309611",fin:"BANCO MONEO S/A"},
+  "755":{plot:"+ALAGOAS",cor:"PRATA",prop:"S2 TURISMO LTDA",crv:"18304495422",fin:"CONVENIO ICMS 30-11-2023"},
+  "756":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"19708386561",fin:"CONVENIO ICMS 30-11-2023"},
+  "757":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"89676182826",fin:"SEM RESERVA DE DOMINIO"},
+  "758":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"63618321033",fin:"SEM RESERVA DE DOMINIO"},
+  "759":{plot:"WS TUR",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"31406885893",fin:"CONVENIO 51/00 DT LIMITE 27-7-27"},
+  "Caminhão":{plot:"BRANCO",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"03611054183",fin:"SEM RESERVA DE DOMINIO"},
+  "HB20":{plot:"BRANCO",cor:"BRANCO",prop:"S2 TURISMO LTDA",crv:"16400261640",fin:"SEM RESERVA DE DOMINIO"},
+  "Saveiro":{plot:"BRANCO",cor:"BRANCO",prop:"S2 TURISMO LTDA EPP",crv:"63142666016",fin:"SEM RESERVA DE DOMINIO"}
+};
 const MANUT={
   "701":  {plano:20000,ulRev:410007,dataRev:"18/06/2026",kmAtual:413328,proxRev:430007,obs:""},
   "702":  {plano:20000,ulRev:402073,dataRev:"17/07/2026",kmAtual:406571,proxRev:422073,obs:""},
@@ -837,6 +903,17 @@ function openDrawer(frota){
         <div class="spec-item"><div class="spec-label">Cap. / PBT</div><div class="spec-val">${v.cap}P · ${v.pbt}</div></div>
       </div>
     </div>
+    ${(()=>{const cd=CADASTRO[v.f];return cd?`
+    <div class="d-section">
+      <div class="d-title">Cadastro CRLV</div>
+      <div class="spec-grid">
+        <div class="spec-item"><div class="spec-label">Plotagem</div><div class="spec-val">${cd.plot}</div></div>
+        <div class="spec-item"><div class="spec-label">Cor</div><div class="spec-val">${cd.cor}</div></div>
+        <div class="spec-item full"><div class="spec-label">Proprietário</div><div class="spec-val">${cd.prop}</div></div>
+        <div class="spec-item full"><div class="spec-label">Cód. CRV</div><div class="spec-val" style="font-family:monospace;font-size:.8rem">${cd.crv}</div></div>
+        <div class="spec-item full"><div class="spec-label">Financiamento</div><div class="spec-val">${cd.fin}</div></div>
+      </div>
+    </div>`:'';})()}
     <div class="d-section">
       <div class="d-title">Motor &amp; Transmissão</div>
       <div class="spec-grid">
