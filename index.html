@@ -749,13 +749,6 @@ const catBadge={
   'Caminhão':'<span class="badge b-cam">Caminhão</span>',
 };
 
-// KPIs
-document.getElementById('k-rod').textContent   = FROTA.filter(v=>v.cat==='Ônibus rodoviário').length;
-document.getElementById('k-micro').textContent  = FROTA.filter(v=>v.cat==='Micro-ônibus').length;
-document.getElementById('k-van').textContent    = FROTA.filter(v=>v.cat==='Van').length;
-document.getElementById('k-car').textContent    = FROTA.filter(v=>v.cat==='Carro / utilitário').length;
-document.getElementById('k-antt').textContent   = FROTA.filter(v=>v.antt).length;
-
 function getStatus(f){
   const m=MANUT[f];
   if(!m||!m.proxRev||!m.kmAtual) return {label:'—',cls:'rev-none',pct:null,folga:null};
@@ -765,11 +758,48 @@ function getStatus(f){
   return {label:'OK',cls:'rev-ok',pct:(m.plano-folga)/m.plano*100,folga};
 }
 
-const critCount=FROTA.filter(v=>getStatus(v.f).label==='VENCIDA').length;
-document.getElementById('k-crit').textContent=critCount;
-document.getElementById('alerta-count').textContent=critCount;
-
 function fmt(n){return n!=null?n.toLocaleString('pt-BR'):'—';}
+
+// Atualiza MANUT com dados de KM vindos de data/manutencao.json (alimentado por automação externa/n8n),
+// depois roda os KPIs e a renderização inicial.
+async function loadManutencaoData(){
+  try{
+    const resp=await fetch('data/manutencao.json');
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    const entries=await resp.json();
+    entries.forEach(entry=>{
+      const placa=(entry.placa||'').trim().toUpperCase();
+      const veic=FROTA.find(v=>(v.p||'').trim().toUpperCase()===placa);
+      if(!veic) return;
+      const f=veic.f;
+      if(MANUT[f]){
+        MANUT[f].kmAtual=entry.kmAtual;
+        MANUT[f].proxRev=entry.proxRevisao;
+      }else{
+        MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:''};
+      }
+    });
+  }catch(err){
+    console.warn('Falha ao carregar data/manutencao.json — usando dados estáticos de MANUT.',err);
+  }finally{
+    initDashboard();
+  }
+}
+
+function initDashboard(){
+  // KPIs
+  document.getElementById('k-rod').textContent   = FROTA.filter(v=>v.cat==='Ônibus rodoviário').length;
+  document.getElementById('k-micro').textContent  = FROTA.filter(v=>v.cat==='Micro-ônibus').length;
+  document.getElementById('k-van').textContent    = FROTA.filter(v=>v.cat==='Van').length;
+  document.getElementById('k-car').textContent    = FROTA.filter(v=>v.cat==='Carro / utilitário').length;
+  document.getElementById('k-antt').textContent   = FROTA.filter(v=>v.antt).length;
+
+  const critCount=FROTA.filter(v=>getStatus(v.f).label==='VENCIDA').length;
+  document.getElementById('k-crit').textContent=critCount;
+  document.getElementById('alerta-count').textContent=critCount;
+
+  renderTable();
+}
 
 // ABAS
 function showTab(id,btn){
@@ -832,7 +862,6 @@ function renderTable(){
   }).join(''):'<tr><td colspan="11" class="no-results">Nenhum veículo encontrado.</td></tr>';
   document.getElementById('count').textContent=`${data.length} de ${FROTA.length} veículos ativos`;
 }
-renderTable();
 
 // MANUTENÇÃO
 let manutRendered=false;
@@ -986,6 +1015,9 @@ function renderBarChart(id,data,max){
       <div class="bar-val">${d.count}</div>
     </div>`).join('');
 }
+
+// Inicialização: busca KM atualizado antes de renderizar KPIs/tabela.
+loadManutencaoData();
 </script>
 <script>
 (function(){
