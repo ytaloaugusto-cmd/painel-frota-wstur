@@ -847,10 +847,10 @@ async function loadManutencaoData(){
   initDashboard();
 }
 
-// Atualização periódica: re-busca o JSON e re-renderiza tudo que depende de MANUT,
-// sem precisar recarregar a página inteira. Evita a tela "travada" quando a aba
-// do painel fica aberta por muito tempo.
-const MANUT_REFRESH_MS = 5*60*1000; // a cada 5 minutos
+// Atualização por acesso: re-busca o JSON e re-renderiza tudo que depende de MANUT
+// sempre que a aba volta a ficar visível (usuário clicou na aba, voltou de outro
+// app, desbloqueou a tela, etc.) — sem ficar consultando o servidor em intervalo
+// fixo enquanto ninguém está olhando, para não pesar a aba nem gerar tráfego à toa.
 async function refreshManutencaoData(){
   await syncManutencaoData();
   initDashboard();
@@ -858,9 +858,6 @@ async function refreshManutencaoData(){
   renderManut();
 }
 function scheduleManutencaoRefresh(){
-  setInterval(refreshManutencaoData, MANUT_REFRESH_MS);
-  // Também atualiza assim que a aba volta a ficar visível (ex: usuário deixou
-  // o painel aberto em segundo plano e voltou a olhar depois de um tempo).
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible') refreshManutencaoData();
   });
