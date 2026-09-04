@@ -1,12 +1,12 @@
 [
   {
     "placa": "QLA2804",
-    "kmAtual": 413738,
+    "kmAtual": 413805,
     "proxRevisao": 430007
   },
   {
     "placa": "QLA3654",
-    "kmAtual": 407177,
+    "kmAtual": 407204,
     "proxRevisao": 422073
   },
   {
@@ -16,7 +16,7 @@
   },
   {
     "placa": "QLM0046",
-    "kmAtual": 333299,
+    "kmAtual": 333375,
     "proxRevisao": 337852
   },
   {
@@ -46,7 +46,7 @@
   },
   {
     "placa": "NMI0278",
-    "kmAtual": 598441,
+    "kmAtual": 598560,
     "proxRevisao": 604083
   },
   {
@@ -61,7 +61,7 @@
   },
   {
     "placa": "QLM0136",
-    "kmAtual": 333733,
+    "kmAtual": 333800,
     "proxRevisao": 344897
   },
   {
@@ -81,7 +81,7 @@
   },
   {
     "placa": "QWH1694",
-    "kmAtual": 196128,
+    "kmAtual": 196293,
     "proxRevisao": 209901
   },
   {
@@ -91,7 +91,7 @@
   },
   {
     "placa": "QWH1654",
-    "kmAtual": 175513,
+    "kmAtual": 175547,
     "proxRevisao": 182758
   },
   {
@@ -101,12 +101,12 @@
   },
   {
     "placa": "OHH2647",
-    "kmAtual": 711781,
+    "kmAtual": 711862,
     "proxRevisao": 711933
   },
   {
     "placa": "S/P01",
-    "kmAtual": 47284,
+    "kmAtual": 47613,
     "proxRevisao": 50009
   },
   {
@@ -116,7 +116,7 @@
   },
   {
     "placa": "OHG5463",
-    "kmAtual": 718876,
+    "kmAtual": 718931,
     "proxRevisao": 733282
   },
   {
@@ -131,12 +131,12 @@
   },
   {
     "placa": "QLA3664",
-    "kmAtual": 407144,
+    "kmAtual": 407206,
     "proxRevisao": 416553
   },
   {
     "placa": "QLL9846",
-    "kmAtual": 328335,
+    "kmAtual": 328622,
     "proxRevisao": 337116
   },
   {
@@ -156,17 +156,17 @@
   },
   {
     "placa": "QLG6688",
-    "kmAtual": 574894,
+    "kmAtual": 574950,
     "proxRevisao": 592361
   },
   {
     "placa": "QWG4207",
-    "kmAtual": 249346,
+    "kmAtual": 249400,
     "proxRevisao": 252533
   },
   {
     "placa": "QLH4597",
-    "kmAtual": 315692,
+    "kmAtual": 315840,
     "proxRevisao": 325600
   },
   {
@@ -196,7 +196,7 @@
   },
   {
     "placa": "QLM2981",
-    "kmAtual": 304830,
+    "kmAtual": 304831,
     "proxRevisao": 310142
   },
   {
@@ -206,7 +206,7 @@
   },
   {
     "placa": "QLJ5397",
-    "kmAtual": 359788,
+    "kmAtual": 359844,
     "proxRevisao": 367078
   },
   {
@@ -216,12 +216,12 @@
   },
   {
     "placa": "QTT4691",
-    "kmAtual": 194878,
+    "kmAtual": 195072,
     "proxRevisao": 210307
   },
   {
     "placa": "QWG3260",
-    "kmAtual": 400032,
+    "kmAtual": 400601,
     "proxRevisao": 411535
   },
   {
@@ -231,27 +231,27 @@
   },
   {
     "placa": "QWG4187",
-    "kmAtual": 260538,
+    "kmAtual": 260569,
     "proxRevisao": 277965
   },
   {
     "placa": "SAI5H68",
-    "kmAtual": 104053,
+    "kmAtual": 104165,
     "proxRevisao": 111329
   },
   {
     "placa": "SAI1D18",
-    "kmAtual": 124000,
+    "kmAtual": 124173,
     "proxRevisao": 138238
   },
   {
     "placa": "TNJ1J49",
-    "kmAtual": 50128,
+    "kmAtual": 50282,
     "proxRevisao": 54488
   },
   {
     "placa": "MUI6F52",
-    "kmAtual": 99447,
+    "kmAtual": 99648,
     "proxRevisao": 108971
   }
 ]
