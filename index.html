@@ -53,7 +53,7 @@ html,body{background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-
 h2.section{font-family:var(--font-cond);font-size:.9rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--ws-cyan);font-weight:700;margin:32px 0 14px}
 
 /* KPIs */
-.kpi-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-bottom:24px}
 .kpi{background:var(--surface);border:1px solid var(--ring);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden}
 .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent,var(--ws-cyan))}
 .kpi .k-label{color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px}
@@ -96,6 +96,7 @@ table.tbl tr.clickable:hover td{background:var(--surface-2)}
 .rev-warn{color:var(--warn);font-size:.76rem;font-weight:600}
 .rev-crit{color:var(--critical);font-size:.76rem;font-weight:600}
 .rev-none{color:var(--muted);font-size:.76rem}
+.rev-stopped{color:var(--s6);font-size:.76rem;font-weight:700}
 .km-bar{display:inline-block;width:60px;height:6px;border-radius:3px;background:var(--grid);vertical-align:middle;margin-left:4px;position:relative;overflow:hidden}
 .km-bar-fill{height:100%;border-radius:3px;position:absolute;left:0;top:0}
 
@@ -388,6 +389,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
     <div class="kpi" style="--accent:var(--s4)"><div class="k-label">Carros</div><div class="k-val" style="color:var(--s4)" id="k-car">—</div><div class="k-sub">utilitários</div></div>
     <div class="kpi" style="--accent:var(--ws-green)"><div class="k-label">ANTT</div><div class="k-val" style="color:var(--ws-green)" id="k-antt">—</div><div class="k-sub">registrados</div></div>
     <div class="kpi" style="--accent:var(--critical)"><div class="k-label">Rev. vencida</div><div class="k-val" style="color:var(--critical)" id="k-crit">—</div><div class="k-sub">frotas</div></div>
+    <div class="kpi" style="--accent:var(--s6)"><div class="k-label">Parado 5+ dias</div><div class="k-val" style="color:var(--s6)" id="k-parado">—</div><div class="k-sub">sem atualização</div></div>
   </div>
 
   <h2 class="section">Inventário — clique na frota para ver a ficha técnica</h2>
@@ -407,6 +409,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
       <button class="chip" onclick="setCat(this,'Carro / utilitário')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12L6 7h12l3 5v4H3z"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>Carro</button>
       <button class="chip" onclick="setCat(this,'antt')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Com ANTT</button>
       <button class="chip" onclick="setCat(this,'alertas')">🔴 Alertas revisão</button>
+      <button class="chip" onclick="setCat(this,'parados')">⏸ Parados 5+ dias</button>
       <button class="chip" onclick="setCat(this,'W2S')">W2S</button>
       <button class="chip" onclick="setCat(this,'S2')">S2</button>
     </div>
@@ -448,7 +451,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
         <th>Frota</th><th>Modelo</th><th>Plano km</th>
         <th>Última revisão</th><th>Data</th>
         <th>KM Atual</th><th>Próxima revisão</th>
-        <th>Progresso</th><th>Status</th>
+        <th>Progresso</th><th>Status</th><th>Últ. atualização KM</th>
       </tr></thead>
       <tbody id="manut-tbody"></tbody>
     </table>
@@ -813,6 +816,24 @@ function getStatus(f){
   return {label:'OK',cls:'rev-ok',pct:(m.plano-folga)/m.plano*100,folga};
 }
 
+// Dias sem atualização de KM (baseado na data da última leitura do rastreador,
+// vinda de MANUT[f].ultimaLeitura via data/manutencao.json). null = sem info.
+const DIAS_PARADO_ALERTA = 5;
+function diasParado(f){
+  const m=MANUT[f];
+  if(!m||!m.ultimaLeitura) return null;
+  const last=new Date(m.ultimaLeitura+'T00:00:00');
+  if(isNaN(last.getTime())) return null;
+  const hoje=new Date();
+  hoje.setHours(0,0,0,0);
+  last.setHours(0,0,0,0);
+  return Math.round((hoje-last)/86400000);
+}
+function isInoperante(f){
+  const d=diasParado(f);
+  return d!=null && d>=DIAS_PARADO_ALERTA;
+}
+
 function fmt(n){return n!=null?n.toLocaleString('pt-BR'):'—';}
 
 // Busca data/manutencao.json (alimentado por automação externa/n8n) e mescla em MANUT.
@@ -830,8 +851,9 @@ async function syncManutencaoData(){
       if(MANUT[f]){
         MANUT[f].kmAtual=entry.kmAtual;
         MANUT[f].proxRev=entry.proxRevisao;
+        MANUT[f].ultimaLeitura=entry.ultimaLeitura||null;
       }else{
-        MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:''};
+        MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:'',ultimaLeitura:entry.ultimaLeitura||null};
       }
     });
     return true;
@@ -873,7 +895,11 @@ function initDashboard(){
 
   const critCount=FROTA.filter(v=>getStatus(v.f).label==='VENCIDA').length;
   document.getElementById('k-crit').textContent=critCount;
-  document.getElementById('alerta-count').textContent=critCount;
+
+  const paradoCount=FROTA.filter(v=>isInoperante(v.f)).length;
+  document.getElementById('k-parado').textContent=paradoCount;
+
+  document.getElementById('alerta-count').textContent=critCount+paradoCount;
 
   renderTable();
 }
@@ -904,6 +930,7 @@ function renderTable(){
     const st=getStatus(v.f);
     if(activeCat==='antt') return v.antt;
     if(activeCat==='alertas') return st.label==='VENCIDA'||st.label==='IMINENTE';
+    if(activeCat==='parados') return isInoperante(v.f);
     if(activeCat==='W2S') return v.emp.includes('W2S');
     if(activeCat==='S2')  return v.emp.includes('S2');
     if(activeCat && v.cat!==activeCat) return false;
@@ -923,6 +950,9 @@ function renderTable(){
       const col=st.label==='VENCIDA'?'var(--critical)':st.label==='IMINENTE'?'var(--warn)':'var(--ok)';
       barHtml=`<div class="km-bar"><div class="km-bar-fill" style="width:${Math.min(100,st.pct)}%;background:${col}"></div></div>`;
     }
+    const dp=diasParado(v.f);
+    const inop=dp!=null&&dp>=DIAS_PARADO_ALERTA;
+    const inopHtml=inop?`<span class="rev-stopped" style="margin-left:6px" title="Sem atualização de KM há ${dp} dias">⏸ PARADO ${dp}d</span>`:'';
     return `<tr class="clickable" onclick="openDrawer('${v.f}')">
       <td class="mono">${v.f}</td>
       <td><span class="placa">${v.p}</span></td>
@@ -934,7 +964,7 @@ function renderTable(){
       <td class="dim">${v.ano}</td>
       <td class="dim">${kmAtual}</td>
       <td class="dim">${proxRev}</td>
-      <td><span class="${st.cls}">${st.label}</span>${barHtml}</td>
+      <td><span class="${st.cls}">${st.label}</span>${barHtml}${inopHtml}</td>
       <td>${v.antt?'<span class="badge b-antt">ANTT</span>':''}</td>
     </tr>`;
   }).join(''):'<tr><td colspan="12" class="no-results">Nenhum veículo encontrado.</td></tr>';
@@ -956,7 +986,12 @@ function renderManut(){
     const prog=`<div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>`;
     const hasObs=md.obs&&md.obs.trim();
     const obsHtml=hasObs?`<span style="font-size:.76rem;color:var(--warn)">${md.obs}</span>`:'<span class="dim">—</span>';
-    return `<tr>
+    const dp=diasParado(v.f);
+    const inop=dp!=null&&dp>=DIAS_PARADO_ALERTA;
+    const ultAtHtml=dp==null?'<span class="dim">—</span>':
+      inop?`<span class="rev-stopped">⏸ ${md.ultimaLeitura} (${dp}d)</span>`:
+      `<span class="dim">${md.ultimaLeitura} (${dp}d)</span>`;
+    return `<tr${inop?' style="background:rgba(139,121,230,.08)"':''}>
       <td>${v.f}</td>
       <td style="font-size:.78rem">${v.m}</td>
       <td class="dim">${fmt(md.plano)}</td>
@@ -966,6 +1001,7 @@ function renderManut(){
       <td style="font-weight:600">${fmt(md.proxRev)}</td>
       <td>${prog} <span class="${st.cls}" style="font-size:.72rem;margin-left:4px">${st.folga!=null?(st.folga>0?'+':'')+st.folga.toLocaleString('pt-BR')+' km':'—'}</span></td>
       <td><span class="${st.cls}">${st.label}</span></td>
+      <td>${ultAtHtml}</td>
     </tr>`;
   }).filter(Boolean);
   tbody.innerHTML=rows.join('');
@@ -982,6 +1018,10 @@ function openDrawer(frota){
   const pct=st.pct!=null?Math.min(100,st.pct):0;
   const col=st.label==='VENCIDA'?'var(--critical)':st.label==='IMINENTE'?'var(--warn)':'var(--ok)';
   const obsClass=st.label==='VENCIDA'?'obs-box crit':'obs-box';
+  const dp=diasParado(v.f);
+  const inop=dp!=null&&dp>=DIAS_PARADO_ALERTA;
+  const ultLeituraLine=md&&md.ultimaLeitura?`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v${inop?' rev-stopped':''}">${md.ultimaLeitura}${dp!=null?' ('+dp+' dia'+(dp===1?'':'s')+' atrás)':''}</span></div>`:'';
+  const inopBox=inop?`<div class="obs-box crit">⏸ <strong>Veículo inoperante:</strong> sem atualização de quilometragem há ${dp} dias. Verifique se o veículo está parado ou se há problema de sincronização com o rastreador.</div>`:'';
   const revSection=md?`
     <div class="d-section">
       <div class="d-title">Manutenção Preventiva</div>
@@ -990,11 +1030,13 @@ function openDrawer(frota){
       <div class="mi"><span class="mi-l">Próxima revisão</span><span class="mi-v">${fmt(md.proxRev)} km</span></div>
       <div class="mi"><span class="mi-l">Plano de revisão</span><span class="mi-v">a cada ${fmt(md.plano)} km</span></div>
       <div class="mi"><span class="mi-l">Status</span><span class="mi-v ${st.cls}">${st.label} ${st.folga!=null?'(folga: '+(st.folga>0?'+':'')+st.folga.toLocaleString('pt-BR')+' km)':''}</span></div>
+      ${ultLeituraLine}
       <div class="km-prog-wrap">
         <div class="km-prog-bar"><div class="km-prog-fill" style="width:${pct}%;background:${col}"></div></div>
         <div class="km-labels"><span>${fmt(md.ulRev)} km</span><span>Próxima: ${fmt(md.proxRev)} km</span></div>
       </div>
       ${md.obs?`<div class="${obsClass}">${md.obs}</div>`:''}
+      ${inopBox}
     </div>`:'';
   document.getElementById('drawer-body').innerHTML=`
     <div class="d-section">
