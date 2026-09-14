@@ -1,0 +1,184 @@
+# Painel da Frota — W2S Locação / S2 Turismo — Documentação técnica
+
+> Este arquivo é a **fonte de verdade** do projeto. Sempre que uma conversa nova
+> for aberta com a Claude sobre este painel, a primeira coisa a fazer é ler
+> este arquivo direto do repositório (não depender de resumo de conversa
+> antiga, que pode perder detalhes ou "alucinar" informação).
+
+Última atualização: 2026-09-14
+
+---
+
+## 1. O que é o projeto
+
+Painel HTML único (`index.html`) de gestão da frota da W2S Locação / S2
+Turismo (Maceió/AL): inventário de veículos, manutenção preventiva (KM x
+revisão), gráficos, referência técnica dos motores e ocorrências (O.S.).
+
+- Repositório GitHub: `ytaloaugusto-cmd/painel-frota-wstur`, branch `main`.
+- Publicado via **GitHub Pages**.
+- Domínio próprio: **https://frotaws.com** (DNS apontando pro GitHub Pages).
+- Protegido por **Cloudflare Access** (login obrigatório antes de ver o site).
+- Todo o app é client-side: um `index.html` só, sem backend próprio.
+
+## 2. Estrutura de arquivos no repositório
+
+- `index.html` — o painel inteiro (HTML + CSS + JS em 2 blocos `<script>`).
+- `data/manutencao.json` — pequeno arquivo JSON, atualizado automaticamente
+  pelo n8n, com KM atual e próxima revisão de cada veículo (ver seção 4).
+- `CNAME` — domínio customizado do GitHub Pages (`frotaws.com`).
+- `busca.html`, `menu.html` — páginas auxiliares antigas (não mexidas
+  recentemente).
+
+Dentro do `index.html`, dois blocos `<script>`:
+1. **Script principal** — contém `const FROTA=[...]` (64 veículos, campos:
+   `f,p,m,cat,mot,motorSN,motorObs?,cv,cap,ano,emp,antt,chas,renavam,cil,torq,
+   euro,cambio,pbt,oleo,interv`), `const MANUT={...}` (por frota: `plano,ulRev,
+   dataRev,kmAtual,proxRev,obs,ultimaLeitura`), `const CADASTRO={...}` (por
+   frota: `plot,cor,prop,crv,fin`), e todas as funções de render/lógica.
+2. **Script da aba Ocorrências (O.S.)** — uma IIFE separada com
+   `const fleet=[...]` e `window.ocRenderCharts`. **Nunca deve ser tocado**
+   em atualizações relacionadas a KM/manutenção — é um módulo independente.
+
+## 3. Como fazer deploy de uma alteração
+
+Não há CI/CD nem `git push` configurado nesta sessão (o ambiente de trabalho
+da Claude não é um clone git, é só uma cópia local dos arquivos). O deploy é
+manual, via interface web do GitHub:
+
+1. Editar o arquivo localmente.
+2. Rodar `node --check` nos dois blocos `<script>` extraídos, pra garantir
+   que não quebrou a sintaxe.
+3. Ir em `https://github.com/ytaloaugusto-cmd/painel-frota-wstur/upload/main`
+   (ou `/upload/main/data` pra atualizar algo dentro de `data/`).
+4. Fazer upload do arquivo (arrastar ou pelo seletor de arquivos).
+5. Clicar em "Commit changes" (commit direto na `main`).
+6. Verificar o deploy buscando
+   `https://raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/index.html`
+   (não passa pelo Cloudflare Access, então dá pra conferir sem login) e
+   checando se os trechos esperados estão lá.
+
+**Detalhe de automação via browser (Claude in Chrome):** o botão "Commit
+changes" às vezes fica com uma referência de elemento "velha" que aponta pro
+lugar errado. Solução que funciona sempre: `scroll_to` no elemento, tirar
+`screenshot`, e clicar pelas coordenadas do pixel em vez de pela referência.
+
+## 4. Automação de KM via n8n (opção escolhida: "opção 3")
+
+O rastreador/planilha de quilometragem é gerenciado pelo n8n. Em vez de
+mandar e-mail com planilha pra alguém lançar manualmente, o n8n **escreve
+direto no repositório GitHub**, atualizando só o arquivo `data/manutencao.json`.
+
+- Formato do `data/manutencao.json`: array de objetos, um por veículo:
+  ```json
+  { "placa": "QLA2804", "kmAtual": 413328, "proxRevisao": 430007 }
+  ```
+  (campo opcional `ultimaLeitura` também é suportado — ver seção 5 — mas o
+  n8n **ainda não está mandando esse campo** hoje, 2026-09-14).
+- Mecanismo do n8n: GET no arquivo via GitHub Contents API (pra pegar o
+  `sha` atual) → monta o novo JSON → PUT com `sha` + conteúdo em base64 +
+  mensagem de commit.
+- Autenticação: GitHub **fine-grained Personal Access Token** chamado
+  `n8n-frota-km`, escopo `Contents: Read and write` (+ `Metadata: Read-only`
+  automático), limitado só ao repo `painel-frota-wstur`, expira em
+  **2026-09-27** — **precisa ser renovado antes dessa data ou a automação
+  para de funcionar**.
+- No `index.html`, a função `syncManutencaoData()` faz
+  `fetch('data/manutencao.json',{cache:'no-store'})` e mescla os dados no
+  objeto `MANUT` em memória (casando por placa com `FROTA`).
+- **Atualização em tela**: não existe mais polling automático
+  (`setInterval` foi removido a pedido do usuário, pra não pesar a aba/rede).
+  A atualização acontece só quando a aba volta a ficar visível
+  (`visibilitychange` → `refreshManutencaoData()`), cobrindo o caso real de
+  uso (KM é atualizado uma vez por dia, de madrugada).
+- Status: **automação 100% funcionando e confirmada pelo usuário** desde
+  antes desta atualização.
+
+## 5. Alertas de veículo parado / sem comunicação (funcionalidade mais recente)
+
+Pedido do usuário: se um veículo ficar **5 dias ou mais** sem atualização de
+KM, mostrar alerta — mas distinguindo dois motivos diferentes:
+
+1. **"sem-comunicacao"** — o veículo simplesmente **para de aparecer** no
+   `data/manutencao.json` (falha do rastreador ou da automação n8n).
+2. **"parado"** — o veículo continua aparecendo normalmente, mas o **valor
+   de KM não muda** por 5+ dias (veículo realmente parado, ou rastreador
+   travado sempre mandando a mesma leitura).
+
+Implementado em `index.html` via a função `getKmAlert(f)`, que retorna
+`{tipo:'sem-comunicacao'|'parado', dias:N}` ou `null`:
+
+- Se `MANUT[f].ultimaLeitura` existir (fonte mais confiável, viria do n8n/
+  rastreador, funciona entre navegadores/dispositivos), usa ela — só detecta
+  o tipo `"parado"` nesse caminho.
+- Se não existir (caso atual, já que o n8n ainda não manda esse campo), usa
+  um **histórico guardado no `localStorage` do navegador**
+  (`KM_TRACK_KEY = 'wsfrota_km_track_v1'`), atualizado a cada sync bem
+  sucedido: `lastSeen` (última vez que a placa apareceu no feed — se sumir,
+  fica congelado, detectando "sem-comunicacao") e `kmSince` (data em que o
+  KM mudou pela última vez — se o valor não mudar, fica congelado,
+  detectando "parado"). **Limitação conhecida:** esse histórico é local ao
+  navegador — some se limpar cache ou usar outro dispositivo/navegador, e
+  não tem histórico nenhum nos primeiros dias após um deploy novo (não vai
+  mostrar alerta até acumular ~5 dias de leituras).
+
+Onde os alertas aparecem:
+- **Inventário** (tabela): selo `📡 SEM COMUNICAÇÃO Xd` (vermelho, classe CSS
+  `.rev-nodata`) ou `⏸ PARADO Xd` (roxo, classe `.rev-stopped`), coluna
+  Status. Filtro dedicado `activeCat==='parados'` usa `getKmAlert()`.
+- **Manutenção Preventiva** (tabela): linha destacada + coluna "Últ.
+  atualização KM" com o mesmo selo/estilo.
+- **Ficha do veículo (drawer)**: linha com data/motivo detalhado +
+  `.obs-box.crit` explicando qual dos dois problemas é.
+- **Indicador no topo** ("Parado 5+ dias", `k-parado`): conta os dois tipos
+  juntos. Soma também no contador vermelho geral (`alerta-count`), junto
+  com as revisões vencidas.
+- **`sync-banner`** (topo do Inventário): separado dos alertas por veículo —
+  aparece só se o **arquivo inteiro** `data/manutencao.json` falhar ao
+  carregar (rede fora do ar, JSON quebrado, etc.), via `lastSyncFailed` +
+  `updateSyncBanner()`. Mostra a data da última sincronização bem-sucedida
+  (guardada em `localStorage['wsfrota_last_sync_ok']`).
+
+**Quando o n8n futuramente passar a mandar o campo `ultimaLeitura`**, o
+sistema automaticamente vai preferir essa fonte (mais confiável, funciona
+em qualquer dispositivo) em vez do histórico local — não precisa mexer em
+mais nada no `index.html` pra isso, só o n8n começar a mandar o campo.
+
+Testado (Node.js, simulação com `FROTA`/`MANUT`/histórico local mockados):
+leitura antiga via `ultimaLeitura` → `parado`; leitura recente → `null`;
+veículo sumindo do feed → `sem-comunicacao`; KM congelado com veículo
+presente → `parado`; tudo normal ou sem histórico ainda → `null`. Todos os
+casos bateram como esperado.
+
+Deploy desta funcionalidade: **feito e confirmado no ar** em 2026-09-14
+(raw.githubusercontent.com verificado, sem sobras de código antigo
+`diasParado`/`isInoperante`, aba de Ocorrências intacta).
+
+## 6. Decisões de design importantes (não reverter sem avisar o usuário)
+
+- **Sem polling/`setInterval`**: atualização só por `visibilitychange`
+  (pedido explícito do usuário, pra não pesar a aba/rede — KM só muda 1x/dia
+  de madrugada mesmo).
+- **Alertas de KM parado usam 5 dias** como limiar (`DIAS_PARADO_ALERTA`).
+- **Aba Ocorrências (O.S.) é intocável** em qualquer merge relacionado a
+  frota/manutenção/KM — é um módulo separado, sempre confirmar que o script
+  dela ficou idêntico depois de qualquer edição.
+- **Nunca commitar dados sensíveis** (o token do n8n não deve nunca aparecer
+  em nenhum arquivo do repositório — ele fica só configurado dentro do
+  próprio n8n).
+
+## 7. Pendências / próximos passos conhecidos
+
+- [ ] Renovar o GitHub PAT `n8n-frota-km` antes de **2026-09-27** (expira).
+- [ ] Se possível, pedir pro n8n passar a mandar o campo `ultimaLeitura` no
+  `data/manutencao.json` — melhora a confiabilidade do alerta de "parado"
+  (deixa de depender de histórico local por navegador).
+- [ ] Nenhuma pendência bloqueante de código no momento — o alerta de dois
+  tipos (sem-comunicação / parado) está deployado e verificado.
+
+## 8. Como retomar o trabalho numa conversa nova
+
+Basta pedir pra Claude ler este arquivo
+(`raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/NOTES.md`)
+ou anexar/colar o conteúdo dele no início da conversa. Isso substitui
+qualquer necessidade de repetir o histórico completo da conversa anterior.
