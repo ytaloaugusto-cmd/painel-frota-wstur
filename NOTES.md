@@ -1,11 +1,29 @@
 # Painel da Frota — W2S Locação / S2 Turismo — Documentação técnica
 
-> Este arquivo é a **fonte de verdade** do projeto. Sempre que uma conversa nova
-> for aberta com a Claude sobre este painel, a primeira coisa a fazer é ler
-> este arquivo direto do repositório (não depender de resumo de conversa
-> antiga, que pode perder detalhes ou "alucinar" informação).
+> **INSTRUÇÃO PARA A CLAUDE (leia isto primeiro, em qualquer conversa sobre
+> este projeto):**
+>
+> 1. Este arquivo é a **fonte de verdade** do projeto. No início de qualquer
+>    conversa nova sobre o painel, leia este arquivo direto do link abaixo
+>    antes de fazer qualquer alteração — não confie em resumo de conversa
+>    antiga nem em memória própria, que podem perder detalhes ou inventar
+>    informação:
+>    `https://raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/NOTES.md`
+> 2. **Sempre que você fizer uma mudança relevante no projeto** (nova
+>    funcionalidade, mudança de arquitetura, decisão de design, pendência
+>    resolvida ou nova pendência, mudança na automação do n8n, etc.),
+>    **atualize este mesmo arquivo** (edite as seções correspondentes,
+>    atualize a data em "Última atualização") **e faça o commit dele no
+>    repositório**, junto com a mudança de código — pelo mesmo fluxo de
+>    upload descrito na seção 3. Nunca deixe este arquivo desatualizado em
+>    relação ao que está de fato no ar.
+> 3. Se o usuário pedir para "salvar"/"anotar" algo sobre o projeto, o lugar
+>    certo é aqui — não apenas responder na conversa.
 
 Última atualização: 2026-09-14
+
+Link direto (sempre a versão mais atual):
+`https://raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/NOTES.md`
 
 ---
 
