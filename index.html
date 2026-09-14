@@ -97,6 +97,7 @@ table.tbl tr.clickable:hover td{background:var(--surface-2)}
 .rev-crit{color:var(--critical);font-size:.76rem;font-weight:600}
 .rev-none{color:var(--muted);font-size:.76rem}
 .rev-stopped{color:var(--s6);font-size:.76rem;font-weight:700}
+.rev-nodata{color:var(--critical);font-size:.76rem;font-weight:700}
 .km-bar{display:inline-block;width:60px;height:6px;border-radius:3px;background:var(--grid);vertical-align:middle;margin-left:4px;position:relative;overflow:hidden}
 .km-bar-fill{height:100%;border-radius:3px;position:absolute;left:0;top:0}
 
@@ -380,6 +381,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
 
 <!-- ════ ABA: INVENTÁRIO ════ -->
 <div class="tab-panel active" id="tab-inventario">
+  <div id="sync-banner" class="obs-box crit" style="display:none;margin-top:0;margin-bottom:14px"></div>
   <h2 class="section">Resumo da frota</h2>
   <div class="kpi-grid">
     <div class="kpi" style="--accent:var(--ws-cyan)"><div class="k-label">Total ativo</div><div class="k-val" style="color:var(--ws-cyan)">64</div><div class="k-sub">veículos</div></div>
@@ -816,25 +818,63 @@ function getStatus(f){
   return {label:'OK',cls:'rev-ok',pct:(m.plano-folga)/m.plano*100,folga};
 }
 
-// Dias sem atualização de KM (baseado na data da última leitura do rastreador,
-// vinda de MANUT[f].ultimaLeitura via data/manutencao.json). null = sem info.
+// ── Alertas de sincronização de KM ──────────────────────────────────────
+// Duas situações distintas, ambas usando o mesmo limite de dias:
+//  • "sem-comunicacao": o veículo simplesmente parou de aparecer no arquivo
+//    data/manutencao.json — o rastreador (ou o n8n) parou de mandar dado dele.
+//  • "parado": o veículo continua aparecendo normalmente, mas o valor de KM
+//    não muda de um dia para o outro — pode ser o veículo realmente parado,
+//    ou o rastreador travado sempre enviando a mesma leitura.
+// Quando o próprio data/manutencao.json já traz a data da última leitura do
+// rastreador por veículo (campo "ultimaLeitura"), usamos ela — é a fonte mais
+// confiável. Na falta dela, mantemos um histórico local (neste navegador),
+// comparando a leitura de hoje com a de dias anteriores, para funcionar mesmo
+// sem depender de nenhuma mudança no n8n.
 const DIAS_PARADO_ALERTA = 5;
-function diasParado(f){
-  const m=MANUT[f];
-  if(!m||!m.ultimaLeitura) return null;
-  const last=new Date(m.ultimaLeitura+'T00:00:00');
-  if(isNaN(last.getTime())) return null;
-  const hoje=new Date();
-  hoje.setHours(0,0,0,0);
-  last.setHours(0,0,0,0);
-  return Math.round((hoje-last)/86400000);
+const KM_TRACK_KEY = 'wsfrota_km_track_v1';
+
+function todayISO(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
-function isInoperante(f){
-  const d=diasParado(f);
-  return d!=null && d>=DIAS_PARADO_ALERTA;
+function diasEntre(dataISO,hojeISO){
+  if(!dataISO) return null;
+  const a=new Date(dataISO+'T00:00:00'), b=new Date((hojeISO||todayISO())+'T00:00:00');
+  if(isNaN(a.getTime())||isNaN(b.getTime())) return null;
+  return Math.round((b-a)/86400000);
+}
+function loadKmTrack(){
+  try{ return JSON.parse(localStorage.getItem(KM_TRACK_KEY)||'{}'); }catch(e){ return {}; }
+}
+function saveKmTrack(t){
+  try{ localStorage.setItem(KM_TRACK_KEY,JSON.stringify(t)); }catch(e){}
+}
+
+// Retorna {tipo:'sem-comunicacao'|'parado', dias:N} ou null se estiver tudo ok
+// (ou se ainda não há histórico suficiente para avaliar).
+function getKmAlert(f){
+  const v=FROTA.find(x=>x.f===f);
+  const md=MANUT[f];
+  if(!v||!md) return null;
+  if(md.ultimaLeitura){
+    const d=diasEntre(md.ultimaLeitura);
+    if(d!=null && d>=DIAS_PARADO_ALERTA) return {tipo:'parado',dias:d};
+    return null;
+  }
+  const track=loadKmTrack();
+  const placa=(v.p||'').trim().toUpperCase();
+  const rec=track[placa];
+  if(!rec) return null;
+  const diasSemComunicacao=diasEntre(rec.lastSeen);
+  if(diasSemComunicacao!=null && diasSemComunicacao>=DIAS_PARADO_ALERTA) return {tipo:'sem-comunicacao',dias:diasSemComunicacao};
+  const diasSemMudarKm=diasEntre(rec.kmSince);
+  if(diasSemMudarKm!=null && diasSemMudarKm>=DIAS_PARADO_ALERTA) return {tipo:'parado',dias:diasSemMudarKm};
+  return null;
 }
 
 function fmt(n){return n!=null?n.toLocaleString('pt-BR'):'—';}
+
+let lastSyncFailed=false;
 
 // Busca data/manutencao.json (alimentado por automação externa/n8n) e mescla em MANUT.
 // Retorna true se conseguiu buscar dados novos, false se caiu no fallback estático.
@@ -843,6 +883,8 @@ async function syncManutencaoData(){
     const resp=await fetch('data/manutencao.json',{cache:'no-store'});
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     const entries=await resp.json();
+    const hoje=todayISO();
+    const track=loadKmTrack();
     entries.forEach(entry=>{
       const placa=(entry.placa||'').trim().toUpperCase();
       const veic=FROTA.find(v=>(v.p||'').trim().toUpperCase()===placa);
@@ -855,17 +897,45 @@ async function syncManutencaoData(){
       }else{
         MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:'',ultimaLeitura:entry.ultimaLeitura||null};
       }
+      // Histórico local, usado quando o n8n ainda não manda "ultimaLeitura".
+      const anterior=track[placa];
+      track[placa]={
+        lastSeen:hoje,
+        km:entry.kmAtual,
+        kmSince:(anterior && anterior.km===entry.kmAtual)?anterior.kmSince:hoje
+      };
     });
+    saveKmTrack(track);
+    lastSyncFailed=false;
     return true;
   }catch(err){
     console.warn('Falha ao carregar data/manutencao.json — usando dados estáticos de MANUT.',err);
+    lastSyncFailed=true;
     return false;
+  }
+}
+
+// Mostra/esconde o aviso de falha geral de sincronização (quando o próprio
+// data/manutencao.json não pôde ser lido — diferente de um único veículo
+// desatualizado dentro de um arquivo lido com sucesso).
+function updateSyncBanner(){
+  const el=document.getElementById('sync-banner');
+  if(!el) return;
+  if(lastSyncFailed){
+    const ultimoOk=(()=>{try{return localStorage.getItem('wsfrota_last_sync_ok');}catch(e){return null;}})();
+    el.style.display='';
+    el.innerHTML='⚠️ <strong>Falha ao sincronizar dados de quilometragem:</strong> não foi possível ler o arquivo de atualização agora'+(ultimoOk?` (última sincronização bem-sucedida: ${ultimoOk})`:'')+'. Os dados exibidos podem estar desatualizados.';
+  }else{
+    el.style.display='none';
+    el.innerHTML='';
+    try{localStorage.setItem('wsfrota_last_sync_ok',todayISO());}catch(e){}
   }
 }
 
 // Carga inicial da página: busca os dados e roda os KPIs + renderização inicial.
 async function loadManutencaoData(){
   await syncManutencaoData();
+  updateSyncBanner();
   initDashboard();
 }
 
@@ -875,6 +945,7 @@ async function loadManutencaoData(){
 // fixo enquanto ninguém está olhando, para não pesar a aba nem gerar tráfego à toa.
 async function refreshManutencaoData(){
   await syncManutencaoData();
+  updateSyncBanner();
   initDashboard();
   manutRendered=false;
   renderManut();
@@ -896,7 +967,7 @@ function initDashboard(){
   const critCount=FROTA.filter(v=>getStatus(v.f).label==='VENCIDA').length;
   document.getElementById('k-crit').textContent=critCount;
 
-  const paradoCount=FROTA.filter(v=>isInoperante(v.f)).length;
+  const paradoCount=FROTA.filter(v=>getKmAlert(v.f)).length;
   document.getElementById('k-parado').textContent=paradoCount;
 
   document.getElementById('alerta-count').textContent=critCount+paradoCount;
@@ -930,7 +1001,7 @@ function renderTable(){
     const st=getStatus(v.f);
     if(activeCat==='antt') return v.antt;
     if(activeCat==='alertas') return st.label==='VENCIDA'||st.label==='IMINENTE';
-    if(activeCat==='parados') return isInoperante(v.f);
+    if(activeCat==='parados') return !!getKmAlert(v.f);
     if(activeCat==='W2S') return v.emp.includes('W2S');
     if(activeCat==='S2')  return v.emp.includes('S2');
     if(activeCat && v.cat!==activeCat) return false;
@@ -950,9 +1021,10 @@ function renderTable(){
       const col=st.label==='VENCIDA'?'var(--critical)':st.label==='IMINENTE'?'var(--warn)':'var(--ok)';
       barHtml=`<div class="km-bar"><div class="km-bar-fill" style="width:${Math.min(100,st.pct)}%;background:${col}"></div></div>`;
     }
-    const dp=diasParado(v.f);
-    const inop=dp!=null&&dp>=DIAS_PARADO_ALERTA;
-    const inopHtml=inop?`<span class="rev-stopped" style="margin-left:6px" title="Sem atualização de KM há ${dp} dias">⏸ PARADO ${dp}d</span>`:'';
+    const kmAlert=getKmAlert(v.f);
+    const inopHtml=kmAlert?(kmAlert.tipo==='sem-comunicacao'
+      ?`<span class="rev-nodata" style="margin-left:6px" title="Veículo não aparece nos dados recebidos há ${kmAlert.dias} dias">📡 SEM COMUNICAÇÃO ${kmAlert.dias}d</span>`
+      :`<span class="rev-stopped" style="margin-left:6px" title="Quilometragem sem alteração há ${kmAlert.dias} dias">⏸ PARADO ${kmAlert.dias}d</span>`):'';
     return `<tr class="clickable" onclick="openDrawer('${v.f}')">
       <td class="mono">${v.f}</td>
       <td><span class="placa">${v.p}</span></td>
@@ -986,12 +1058,19 @@ function renderManut(){
     const prog=`<div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>`;
     const hasObs=md.obs&&md.obs.trim();
     const obsHtml=hasObs?`<span style="font-size:.76rem;color:var(--warn)">${md.obs}</span>`:'<span class="dim">—</span>';
-    const dp=diasParado(v.f);
-    const inop=dp!=null&&dp>=DIAS_PARADO_ALERTA;
-    const ultAtHtml=dp==null?'<span class="dim">—</span>':
-      inop?`<span class="rev-stopped">⏸ ${md.ultimaLeitura} (${dp}d)</span>`:
-      `<span class="dim">${md.ultimaLeitura} (${dp}d)</span>`;
-    return `<tr${inop?' style="background:rgba(139,121,230,.08)"':''}>
+    const kmAlert=getKmAlert(v.f);
+    const inop=!!kmAlert;
+    let ultAtHtml;
+    if(kmAlert&&kmAlert.tipo==='sem-comunicacao'){
+      ultAtHtml=`<span class="rev-nodata">📡 SEM COMUNICAÇÃO (${kmAlert.dias}d)</span>`;
+    }else if(kmAlert&&kmAlert.tipo==='parado'){
+      ultAtHtml=`<span class="rev-stopped">⏸ ${md.ultimaLeitura?md.ultimaLeitura+' ':''}(${kmAlert.dias}d)</span>`;
+    }else if(md.ultimaLeitura){
+      ultAtHtml=`<span class="dim">${md.ultimaLeitura}</span>`;
+    }else{
+      ultAtHtml='<span class="dim">—</span>';
+    }
+    return `<tr${inop?(kmAlert.tipo==='sem-comunicacao'?' style="background:rgba(224,90,90,.08)"':' style="background:rgba(139,121,230,.08)"'):''}>
       <td>${v.f}</td>
       <td style="font-size:.78rem">${v.m}</td>
       <td class="dim">${fmt(md.plano)}</td>
@@ -1018,10 +1097,23 @@ function openDrawer(frota){
   const pct=st.pct!=null?Math.min(100,st.pct):0;
   const col=st.label==='VENCIDA'?'var(--critical)':st.label==='IMINENTE'?'var(--warn)':'var(--ok)';
   const obsClass=st.label==='VENCIDA'?'obs-box crit':'obs-box';
-  const dp=diasParado(v.f);
-  const inop=dp!=null&&dp>=DIAS_PARADO_ALERTA;
-  const ultLeituraLine=md&&md.ultimaLeitura?`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v${inop?' rev-stopped':''}">${md.ultimaLeitura}${dp!=null?' ('+dp+' dia'+(dp===1?'':'s')+' atrás)':''}</span></div>`:'';
-  const inopBox=inop?`<div class="obs-box crit">⏸ <strong>Veículo inoperante:</strong> sem atualização de quilometragem há ${dp} dias. Verifique se o veículo está parado ou se há problema de sincronização com o rastreador.</div>`:'';
+  const kmAlert=getKmAlert(v.f);
+  const inop=!!kmAlert;
+  const diasTxt=kmAlert?kmAlert.dias+' dia'+(kmAlert.dias===1?'':'s'):'';
+  let ultLeituraLine='';
+  if(kmAlert&&kmAlert.tipo==='sem-comunicacao'){
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v rev-nodata">Sem dados há ${diasTxt}</span></div>`;
+  }else if(kmAlert&&kmAlert.tipo==='parado'){
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v rev-stopped">${md&&md.ultimaLeitura?md.ultimaLeitura+' · ':''}sem variar há ${diasTxt}</span></div>`;
+  }else if(md&&md.ultimaLeitura){
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v">${md.ultimaLeitura}</span></div>`;
+  }
+  let inopBox='';
+  if(kmAlert&&kmAlert.tipo==='sem-comunicacao'){
+    inopBox=`<div class="obs-box crit">📡 <strong>Sem comunicação:</strong> este veículo não aparece nos dados recebidos há ${diasTxt}. O sistema não está recebendo informação de quilometragem dele — verifique o rastreador ou a automação (n8n).</div>`;
+  }else if(kmAlert&&kmAlert.tipo==='parado'){
+    inopBox=`<div class="obs-box crit">⏸ <strong>Veículo parado:</strong> a quilometragem não muda há ${diasTxt}. O sistema está recebendo dados normalmente, mas o valor está congelado — verifique se o veículo está realmente parado ou se o rastreador está travado.</div>`;
+  }
   const revSection=md?`
     <div class="d-section">
       <div class="d-title">Manutenção Preventiva</div>
