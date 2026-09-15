@@ -1,0 +1,31 @@
+{
+  "atualizadoEm": "2026-09-14T21:52:40",
+  "fonte": "Relatório de manutenção - WS 2026 (painel da oficina)",
+  "historico": [
+    {"d":"01/09","n":7},{"d":"02/09","n":7},{"d":"03/09","n":8},{"d":"04/09","n":7},
+    {"d":"05/09","n":9},{"d":"07/09","n":9},{"d":"08/09","n":10},{"d":"09/09","n":8},
+    {"d":"10/09","n":8},{"d":"11/09","n":8},{"d":"12/09","n":8},{"d":"13/09","n":8},{"d":"14/09","n":10}
+  ],
+  "veiculos": [
+    {"frota":"719","apelido":"","entrada":"2026-03-19","cat":"Motor","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Serviço no motor e elétrica; sem extintor; sem estepe; sem abraçadeira do mangote do intercooler"},
+    {"frota":"745","apelido":"Fly6","entrada":"2026-06-01","cat":"Motor","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Serviço no motor (retífica); ar-condicionado; tensor da correia; sensor NOx; sensor de bloqueio da cx de marcha; sem painel; verificar forro para 704"},
+    {"frota":"716","apelido":"","entrada":"2026-07-15","cat":"Lanternagem/Pintura","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Pintura e lanternagem; sem kit chaves de troca de pneus; tranca da mala; amortecedores estão no 717; sem estepe (está no 752)"},
+    {"frota":"711","apelido":"","entrada":"2026-08-11","cat":"Elétrica","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Sem painel de mídia; sem estepe (está no 752); sem a válvula que aciona o bagageiro"},
+    {"frota":"708","apelido":"","entrada":"2026-08-14","cat":"Outros","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Fora da escala de serviços; sem extintor"},
+    {"frota":"755","apelido":"","entrada":"2026-09-03","cat":"Motor","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Problema no bico injetor"},
+    {"frota":"730","apelido":"","entrada":"2026-09-11","cat":"Lanternagem/Pintura","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Serviços de lanternagem para conclusão do serviço de Arla"},
+    {"frota":"710","apelido":"","entrada":"2026-09-13","cat":"Lanternagem/Pintura","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Retido para serviços de lanternagem e caixa de direção"},
+    {"frota":"714","apelido":"","entrada":"2026-09-14","cat":"Pneus/Alinhamento","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Serviço externo de alinhamento e balanceamento"},
+    {"frota":"729","apelido":"","entrada":"2026-09-14","cat":"Pneus/Alinhamento","status":"INOPERANTE","os":"","obs":"",
+      "problema":"Serviço externo de alinhamento e balanceamento"}
+  ]
+}
