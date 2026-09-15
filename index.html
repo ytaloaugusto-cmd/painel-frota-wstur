@@ -97,6 +97,7 @@ table.tbl tr.clickable:hover td{background:var(--surface-2)}
 .rev-crit{color:var(--critical);font-size:.76rem;font-weight:600}
 .rev-none{color:var(--muted);font-size:.76rem}
 .rev-stopped{color:var(--s6);font-size:.76rem;font-weight:700}
+.rev-nodata{color:var(--critical);font-size:.76rem;font-weight:700}
 .km-bar{display:inline-block;width:60px;height:6px;border-radius:3px;background:var(--grid);vertical-align:middle;margin-left:4px;position:relative;overflow:hidden}
 .km-bar-fill{height:100%;border-radius:3px;position:absolute;left:0;top:0}
 
@@ -119,6 +120,35 @@ table.manut-tbl tr:hover td{background:var(--surface-2)}
 table.manut-tbl td:first-child{font-weight:700;color:var(--ws-cyan);font-family:ui-monospace,monospace}
 .prog-bar{width:80px;height:7px;background:var(--grid);border-radius:4px;overflow:hidden;display:inline-block;vertical-align:middle}
 .prog-fill{height:100%;border-radius:4px}
+
+/* ABA OFICINA / CORRETIVA */
+.sync-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface-2);border:1px solid var(--ring);border-left:3px solid var(--ws-cyan);border-radius:10px;padding:10px 16px;font-size:.8rem;color:var(--ink-2);margin-bottom:16px}
+.sync-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0;box-shadow:0 0 0 3px rgba(140,160,190,.15)}
+.sync-dot.live{background:var(--ok);box-shadow:0 0 0 3px rgba(59,194,74,.18)}
+.sync-dot.local{background:var(--warn);box-shadow:0 0 0 3px rgba(250,178,25,.18)}
+.sync-dot.err{background:var(--critical);box-shadow:0 0 0 3px rgba(240,86,79,.18)}
+.sync-bar .btn{margin-left:auto;padding:5px 12px;font-size:.78rem}
+.trend-card{background:var(--surface);border:1px solid var(--ring);border-radius:var(--radius);padding:18px 22px;margin-bottom:16px}
+.trend-bars{display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:14px}
+.trend-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+.trend-fill{width:100%;max-width:34px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--ws-cyan),var(--ws-blue));transition:height .4s ease;position:relative}
+.trend-fill span{position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:.72rem;font-weight:700;color:var(--ink)}
+.trend-day{font-size:.66rem;color:var(--muted);font-family:var(--font-cond)}
+.cat-badge{display:inline-flex;align-items:center;font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:999px;font-family:var(--font-cond);border:1px solid transparent;white-space:nowrap}
+.c-motor{color:#F9A09C;background:rgba(240,86,79,.14);border-color:rgba(240,86,79,.32)}
+.c-eletrica{color:#E6BE70;background:rgba(187,126,19,.14);border-color:rgba(187,126,19,.32)}
+.c-ac{color:#7DD6EE;background:rgba(18,160,192,.14);border-color:rgba(18,160,192,.32)}
+.c-pneus{color:#80B8E8;background:rgba(46,134,201,.14);border-color:rgba(46,134,201,.32)}
+.c-lanternagem{color:#C9AEF0;background:rgba(139,121,230,.14);border-color:rgba(139,121,230,.32)}
+.c-freios{color:#F0A8C7;background:rgba(209,99,160,.14);border-color:rgba(209,99,160,.32)}
+.c-outros{color:#A0D870;background:rgba(99,168,54,.14);border-color:rgba(99,168,54,.32)}
+.dias-tag{font-family:var(--font-cond);font-weight:700;font-size:.86rem}
+.dias-cron{color:var(--critical)}
+.dias-med{color:var(--warn)}
+.dias-ok{color:var(--ok)}
+.status-pill{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:999px;font-family:var(--font-cond);letter-spacing:.05em;color:#F9A09C;background:rgba(240,86,79,.13);border:1px solid rgba(240,86,79,.3)}
+.status-pill.op{color:#8CE39A;background:rgba(59,194,74,.13);border-color:rgba(59,194,74,.3)}
+.problema-cell{font-size:.8rem;color:var(--ink-2);line-height:1.4;max-width:420px}
 
 /* GRÁFICOS */
 .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
@@ -351,6 +381,11 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
       Manutenção Preventiva
       <span class="badge-count" id="alerta-count">—</span>
     </button></li>
+    <li><button onclick="showTab('oficina',this)" id="btn-oficina">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      Oficina
+      <span class="badge-count" id="oficina-count" style="background:var(--warn);color:#08203F">—</span>
+    </button></li>
     <li><button onclick="showTab('graficos',this)">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
       Gráficos
@@ -390,7 +425,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
     <div class="kpi" style="--accent:var(--s4)"><div class="k-label">Carros</div><div class="k-val" style="color:var(--s4)" id="k-car">—</div><div class="k-sub">utilitários</div></div>
     <div class="kpi" style="--accent:var(--ws-green)"><div class="k-label">ANTT</div><div class="k-val" style="color:var(--ws-green)" id="k-antt">—</div><div class="k-sub">registrados</div></div>
     <div class="kpi" style="--accent:var(--critical)"><div class="k-label">Rev. vencida</div><div class="k-val" style="color:var(--critical)" id="k-crit">—</div><div class="k-sub">frotas</div></div>
-    <div class="kpi" style="--accent:var(--s6)"><div class="k-label">Parado 7+ dias</div><div class="k-val" style="color:var(--s6)" id="k-parado">—</div><div class="k-sub">KM sem variar</div></div>
+    <div class="kpi" style="--accent:var(--s6)"><div class="k-label">Parado 5+ dias</div><div class="k-val" style="color:var(--s6)" id="k-parado">—</div><div class="k-sub">sem atualização</div></div>
   </div>
 
   <h2 class="section">Inventário — clique na frota para ver a ficha técnica</h2>
@@ -410,7 +445,8 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
       <button class="chip" onclick="setCat(this,'Carro / utilitário')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12L6 7h12l3 5v4H3z"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>Carro</button>
       <button class="chip" onclick="setCat(this,'antt')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Com ANTT</button>
       <button class="chip" onclick="setCat(this,'alertas')">🔴 Alertas revisão</button>
-      <button class="chip" onclick="setCat(this,'parados')">⏸ Parados 7+ dias</button>
+      <button class="chip" onclick="setCat(this,'parados')">⏸ Parados 5+ dias</button>
+      <button class="chip" onclick="setCat(this,'oficina')">🔧 Na oficina</button>
       <button class="chip" onclick="setCat(this,'W2S')">W2S</button>
       <button class="chip" onclick="setCat(this,'S2')">S2</button>
     </div>
@@ -457,6 +493,65 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
       <tbody id="manut-tbody"></tbody>
     </table>
   </div>
+</div>
+
+<!-- ════ ABA: OFICINA / MANUTENÇÃO CORRETIVA ════ -->
+<div class="tab-panel" id="tab-oficina">
+  <h2 class="section">Oficina — veículos inoperantes</h2>
+
+  <div class="sync-bar">
+    <span class="sync-dot" id="sync-dot-of"></span>
+    <span><strong>Última atualização:</strong> <span id="oficina-updated">—</span></span>
+    <span style="color:var(--muted)">·</span>
+    <span id="sync-status-of">verificando…</span>
+    <button class="btn" onclick="syncCorretiva(true)">↻ Sincronizar agora</button>
+  </div>
+
+  <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="kpi" style="--accent:var(--warn)"><div class="k-label">Inoperantes</div><div class="k-val" style="color:var(--warn)" id="of-total">—</div><div class="k-sub">na oficina agora</div></div>
+    <div class="kpi" style="--accent:var(--critical)"><div class="k-label">Crônicos +30d</div><div class="k-val" style="color:var(--critical)" id="of-cron">—</div><div class="k-sub">parados há +30 dias</div></div>
+    <div class="kpi" style="--accent:var(--ws-cyan)"><div class="k-label">Entradas 7d</div><div class="k-val" style="color:var(--ws-cyan)" id="of-recent">—</div><div class="k-sub">últimos 7 dias</div></div>
+    <div class="kpi" style="--accent:var(--s5)"><div class="k-label">Falha de motor</div><div class="k-val" style="color:var(--s5)" id="of-motor">—</div><div class="k-sub">maior ofensor</div></div>
+    <div class="kpi" style="--accent:var(--ws-green)"><div class="k-label">Disponibilidade</div><div class="k-val" style="color:var(--ws-green)" id="of-disp">—</div><div class="k-sub">da frota ativa</div></div>
+  </div>
+
+  <div class="trend-card">
+    <div class="chart-title">Evolução de veículos inoperantes</div>
+    <div class="chart-sub">nº de veículos parados por dia — relatórios diários da oficina</div>
+    <div class="trend-bars" id="trend-bars"></div>
+  </div>
+
+  <div class="filter-card">
+    <div class="search-row">
+      <div class="sw">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="q-of" type="text" placeholder="Buscar por frota, modelo ou problema…" oninput="renderCorretiva()">
+      </div>
+      <button class="btn" onclick="document.getElementById('q-of').value='';renderCorretiva()">Limpar</button>
+    </div>
+    <div class="chips" id="of-chips">
+      <button class="chip active" onclick="setOfCat(this,'')">Todos</button>
+      <button class="chip" onclick="setOfCat(this,'Motor')">Motor</button>
+      <button class="chip" onclick="setOfCat(this,'Elétrica')">Elétrica</button>
+      <button class="chip" onclick="setOfCat(this,'Ar-condicionado')">Ar-condicionado</button>
+      <button class="chip" onclick="setOfCat(this,'Pneus/Alinhamento')">Pneus/Alinhamento</button>
+      <button class="chip" onclick="setOfCat(this,'Lanternagem/Pintura')">Lanternagem/Pintura</button>
+      <button class="chip" onclick="setOfCat(this,'Freios')">Freios</button>
+      <button class="chip" onclick="setOfCat(this,'Outros')">Outros</button>
+      <button class="chip" onclick="setOfCat(this,'cron')">🔴 Crônicos +30d</button>
+    </div>
+  </div>
+
+  <div class="manut-tbl-card">
+    <table class="manut-tbl">
+      <thead><tr>
+        <th>Frota</th><th>Modelo</th><th>Categoria</th>
+        <th>Entrada</th><th>Dias parado</th><th>Problema relatado</th><th>Status</th>
+      </tr></thead>
+      <tbody id="oficina-tbody"></tbody>
+    </table>
+  </div>
+  <div class="footer"><span id="of-count"></span><span>Fonte: Relatório de manutenção — WS 2026 (painel da oficina)</span></div>
 </div>
 
 <!-- ════ ABA: GRÁFICOS ════ -->
@@ -800,6 +895,62 @@ const MANUT={
   "Saveiro":{plano:10000,ulRev:137574,dataRev:"09/12/2025",kmAtual:26446,proxRev:null,obs:""},
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+//  MANUTENÇÃO CORRETIVA / OFICINA — dados do "Relatório de manutenção WS 2026"
+//  Snapshot do relatório mais recente (14/09/2026), embutido como fallback.
+//
+//  COMO ATUALIZAR VIA n8n (mesmo mecanismo já usado para o KM — ver NOTES.md):
+//   1. O n8n lê o relatório diário da oficina e monta um JSON com o schema abaixo.
+//   2. Publica esse JSON como data/oficina.json neste mesmo repositório (via
+//      GitHub Contents API, igual já faz hoje com data/manutencao.json).
+//   3. A aba busca data/oficina.json ao abrir/atualizar e no botão "Sincronizar
+//      agora"; se o arquivo ainda não existir ou a busca falhar, usa os dados
+//      embutidos abaixo como fallback (modo local).
+//
+//  SCHEMA esperado do data/oficina.json:
+//   {
+//     "atualizadoEm": "2026-09-14T21:52:40",              // ISO ou "dd/mm/aaaa hh:mm"
+//     "fonte": "Relatório de manutenção - WS 2026",
+//     "historico": [ {"d":"14/09","n":10}, ... ],          // opcional (gráfico de tendência)
+//     "veiculos": [
+//       { "frota":"719", "apelido":"", "entrada":"2026-03-19",
+//         "problema":"...", "cat":"Motor", "status":"INOPERANTE", "os":"", "obs":"" }
+//     ]
+//   }
+//  cat ∈ Motor | Elétrica | Ar-condicionado | Pneus/Alinhamento | Lanternagem/Pintura | Freios | Outros
+// ═══════════════════════════════════════════════════════════════════════════
+let MANUT_CORRETIVA = {
+  atualizadoEm:"2026-09-14T21:52:40",
+  fonte:"Relatório de manutenção - WS 2026 (painel da oficina)",
+  historico:[
+    {d:"01/09",n:7},{d:"02/09",n:7},{d:"03/09",n:8},{d:"04/09",n:7},
+    {d:"05/09",n:9},{d:"07/09",n:9},{d:"08/09",n:10},{d:"09/09",n:8},
+    {d:"10/09",n:8},{d:"11/09",n:8},{d:"12/09",n:8},{d:"13/09",n:8},{d:"14/09",n:10}
+  ],
+  veiculos:[
+    {frota:"719",apelido:"",entrada:"2026-03-19",cat:"Motor",status:"INOPERANTE",os:"",obs:"",
+      problema:"Serviço no motor e elétrica; sem extintor; sem estepe; sem abraçadeira do mangote do intercooler"},
+    {frota:"745",apelido:"Fly6",entrada:"2026-06-01",cat:"Motor",status:"INOPERANTE",os:"",obs:"",
+      problema:"Serviço no motor (retífica); ar-condicionado; tensor da correia; sensor NOx; sensor de bloqueio da cx de marcha; sem painel; verificar forro para 704"},
+    {frota:"716",apelido:"",entrada:"2026-07-15",cat:"Lanternagem/Pintura",status:"INOPERANTE",os:"",obs:"",
+      problema:"Pintura e lanternagem; sem kit chaves de troca de pneus; tranca da mala; amortecedores estão no 717; sem estepe (está no 752)"},
+    {frota:"711",apelido:"",entrada:"2026-08-11",cat:"Elétrica",status:"INOPERANTE",os:"",obs:"",
+      problema:"Sem painel de mídia; sem estepe (está no 752); sem a válvula que aciona o bagageiro"},
+    {frota:"708",apelido:"",entrada:"2026-08-14",cat:"Outros",status:"INOPERANTE",os:"",obs:"",
+      problema:"Fora da escala de serviços; sem extintor"},
+    {frota:"755",apelido:"",entrada:"2026-09-03",cat:"Motor",status:"INOPERANTE",os:"",obs:"",
+      problema:"Problema no bico injetor"},
+    {frota:"730",apelido:"",entrada:"2026-09-11",cat:"Lanternagem/Pintura",status:"INOPERANTE",os:"",obs:"",
+      problema:"Serviços de lanternagem para conclusão do serviço de Arla"},
+    {frota:"710",apelido:"",entrada:"2026-09-13",cat:"Lanternagem/Pintura",status:"INOPERANTE",os:"",obs:"",
+      problema:"Retido para serviços de lanternagem e caixa de direção"},
+    {frota:"714",apelido:"",entrada:"2026-09-14",cat:"Pneus/Alinhamento",status:"INOPERANTE",os:"",obs:"",
+      problema:"Serviço externo de alinhamento e balanceamento"},
+    {frota:"729",apelido:"",entrada:"2026-09-14",cat:"Pneus/Alinhamento",status:"INOPERANTE",os:"",obs:"",
+      problema:"Serviço externo de alinhamento e balanceamento"}
+  ]
+};
+
 const catBadge={
   'Ônibus rodoviário':'<span class="badge b-rod">Rodoviário</span>',
   'Micro-ônibus':'<span class="badge b-micro">Micro-ônibus</span>',
@@ -817,22 +968,19 @@ function getStatus(f){
   return {label:'OK',cls:'rev-ok',pct:(m.plano-folga)/m.plano*100,folga};
 }
 
-// ── Alerta de veículo parado ────────────────────────────────────────────
-// Um único tipo de alerta: "parado" — o valor de KM do veículo não muda por
-// DIAS_PARADO_ALERTA dias ou mais (veículo realmente parado, ou rastreador
-// travado sempre enviando a mesma leitura).
-//
-// A DATA "parado desde" (dia em que o KM parou de variar) tem DUAS fontes,
-// nesta ordem de preferência:
-//  1. Campo "paradoDesde" vindo do data/manutencao.json — fonte DURÁVEL:
-//     é gravada pelo n8n (que compara o kmAtual anterior x novo a cada noite),
-//     vive no arquivo, funciona em qualquer navegador/dispositivo e sobrevive
-//     a limpar cache. É a fonte oficial quando presente.
-//  2. Histórico local em localStorage (kmSince) — FALLBACK, usado só enquanto
-//     o n8n ainda não estiver mandando o campo "paradoDesde". Limitação: é por
-//     navegador e some ao limpar cache (por isso é só transição).
-// Assim que o n8n passar a mandar "paradoDesde", o app usa ele automaticamente.
-const DIAS_PARADO_ALERTA = 7;
+// ── Alertas de sincronização de KM ──────────────────────────────────────
+// Duas situações distintas, ambas usando o mesmo limite de dias:
+//  • "sem-comunicacao": o veículo simplesmente parou de aparecer no arquivo
+//    data/manutencao.json — o rastreador (ou o n8n) parou de mandar dado dele.
+//  • "parado": o veículo continua aparecendo normalmente, mas o valor de KM
+//    não muda de um dia para o outro — pode ser o veículo realmente parado,
+//    ou o rastreador travado sempre enviando a mesma leitura.
+// Quando o próprio data/manutencao.json já traz a data da última leitura do
+// rastreador por veículo (campo "ultimaLeitura"), usamos ela — é a fonte mais
+// confiável. Na falta dela, mantemos um histórico local (neste navegador),
+// comparando a leitura de hoje com a de dias anteriores, para funcionar mesmo
+// sem depender de nenhuma mudança no n8n.
+const DIAS_PARADO_ALERTA = 5;
 const KM_TRACK_KEY = 'wsfrota_km_track_v1';
 
 function todayISO(){
@@ -852,32 +1000,25 @@ function saveKmTrack(t){
   try{ localStorage.setItem(KM_TRACK_KEY,JSON.stringify(t)); }catch(e){}
 }
 
-// Data (ISO) desde quando o KM está congelado no valor atual — ou seja, o dia
-// em que o veículo começou a ficar parado. Preferência: campo "paradoDesde" do
-// n8n (durável, no data/manutencao.json); na falta dele, cai no histórico local
-// (kmSince em localStorage). Ver comentário do bloco acima.
-function kmParadoDesde(f){
-  const md=MANUT[f];
-  if(md && md.paradoDesde) return md.paradoDesde;
-  const v=FROTA.find(x=>x.f===f);
-  if(!v) return null;
-  const rec=loadKmTrack()[(v.p||'').trim().toUpperCase()];
-  return rec&&rec.kmSince?rec.kmSince:null;
-}
-function fmtDataBR(iso){
-  if(!iso) return '';
-  const p=String(iso).split('-');
-  return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(iso);
-}
-
-// Retorna {tipo:'parado', dias:N} ou null. Usa a data de kmParadoDesde() (campo
-// do n8n quando existir, senão histórico local) e compara com o limite de dias.
+// Retorna {tipo:'sem-comunicacao'|'parado', dias:N} ou null se estiver tudo ok
+// (ou se ainda não há histórico suficiente para avaliar).
 function getKmAlert(f){
   const v=FROTA.find(x=>x.f===f);
   const md=MANUT[f];
   if(!v||!md) return null;
-  const dias=diasEntre(kmParadoDesde(f));
-  if(dias!=null && dias>=DIAS_PARADO_ALERTA) return {tipo:'parado',dias};
+  if(md.ultimaLeitura){
+    const d=diasEntre(md.ultimaLeitura);
+    if(d!=null && d>=DIAS_PARADO_ALERTA) return {tipo:'parado',dias:d};
+    return null;
+  }
+  const track=loadKmTrack();
+  const placa=(v.p||'').trim().toUpperCase();
+  const rec=track[placa];
+  if(!rec) return null;
+  const diasSemComunicacao=diasEntre(rec.lastSeen);
+  if(diasSemComunicacao!=null && diasSemComunicacao>=DIAS_PARADO_ALERTA) return {tipo:'sem-comunicacao',dias:diasSemComunicacao};
+  const diasSemMudarKm=diasEntre(rec.kmSince);
+  if(diasSemMudarKm!=null && diasSemMudarKm>=DIAS_PARADO_ALERTA) return {tipo:'parado',dias:diasSemMudarKm};
   return null;
 }
 
@@ -899,19 +1040,17 @@ async function syncManutencaoData(){
       const veic=FROTA.find(v=>(v.p||'').trim().toUpperCase()===placa);
       if(!veic) return;
       const f=veic.f;
-      // "paradoDesde": data durável vinda do n8n (fonte oficial quando presente).
-      const paradoDesde=entry.paradoDesde||null;
       if(MANUT[f]){
         MANUT[f].kmAtual=entry.kmAtual;
         MANUT[f].proxRev=entry.proxRevisao;
-        MANUT[f].paradoDesde=paradoDesde;
+        MANUT[f].ultimaLeitura=entry.ultimaLeitura||null;
       }else{
-        MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:'',paradoDesde:paradoDesde};
+        MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:'',ultimaLeitura:entry.ultimaLeitura||null};
       }
-      // Fallback local: guarda a data em que o KM mudou pela última vez (kmSince),
-      // usada só enquanto o n8n ainda não manda "paradoDesde".
+      // Histórico local, usado quando o n8n ainda não manda "ultimaLeitura".
       const anterior=track[placa];
       track[placa]={
+        lastSeen:hoje,
         km:entry.kmAtual,
         kmSince:(anterior && anterior.km===entry.kmAtual)?anterior.kmSince:hoje
       };
@@ -948,6 +1087,7 @@ async function loadManutencaoData(){
   await syncManutencaoData();
   updateSyncBanner();
   initDashboard();
+  syncCorretiva(false);
 }
 
 // Atualização por acesso: re-busca o JSON e re-renderiza tudo que depende de MANUT
@@ -960,6 +1100,7 @@ async function refreshManutencaoData(){
   initDashboard();
   manutRendered=false;
   renderManut();
+  syncCorretiva(false);
 }
 function scheduleManutencaoRefresh(){
   document.addEventListener('visibilitychange',()=>{
@@ -994,6 +1135,7 @@ function showTab(id,btn){
   btn.classList.add('active');
   if(id==='graficos') renderCharts();
   if(id==='manutencao') renderManut();
+  if(id==='oficina') renderCorretiva();
   if(id==='ocorrencias' && window.ocRenderCharts) window.ocRenderCharts();
 }
 
@@ -1001,18 +1143,20 @@ function showTab(id,btn){
 let activeCat='';
 function setCat(el,cat){
   activeCat=cat;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#tab-inventario .chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   renderTable();
 }
 function clearSearch(){document.getElementById('q').value='';renderTable();}
 function renderTable(){
   const q=document.getElementById('q').value.toLowerCase().trim();
+  const inShop=ofSet();
   let data=FROTA.filter(v=>{
     const st=getStatus(v.f);
     if(activeCat==='antt') return v.antt;
     if(activeCat==='alertas') return st.label==='VENCIDA'||st.label==='IMINENTE';
     if(activeCat==='parados') return !!getKmAlert(v.f);
+    if(activeCat==='oficina') return inShop.has(v.f);
     if(activeCat==='W2S') return v.emp.includes('W2S');
     if(activeCat==='S2')  return v.emp.includes('S2');
     if(activeCat && v.cat!==activeCat) return false;
@@ -1033,8 +1177,10 @@ function renderTable(){
       barHtml=`<div class="km-bar"><div class="km-bar-fill" style="width:${Math.min(100,st.pct)}%;background:${col}"></div></div>`;
     }
     const kmAlert=getKmAlert(v.f);
-    const inopHtml=kmAlert
-      ?`<span class="rev-stopped" style="margin-left:6px" title="Parado desde ${fmtDataBR(kmParadoDesde(v.f))} — quilometragem sem alteração há ${kmAlert.dias} dias">⏸ PARADO ${kmAlert.dias}d</span>`:'';
+    const inopHtml=kmAlert?(kmAlert.tipo==='sem-comunicacao'
+      ?`<span class="rev-nodata" style="margin-left:6px" title="Veículo não aparece nos dados recebidos há ${kmAlert.dias} dias">📡 SEM COMUNICAÇÃO ${kmAlert.dias}d</span>`
+      :`<span class="rev-stopped" style="margin-left:6px" title="Quilometragem sem alteração há ${kmAlert.dias} dias">⏸ PARADO ${kmAlert.dias}d</span>`):'';
+    const shopHtml=inShop.has(v.f)?' <span class="cat-badge c-motor" style="margin-left:4px">🔧 oficina</span>':'';
     return `<tr class="clickable" onclick="openDrawer('${v.f}')">
       <td class="mono">${v.f}</td>
       <td><span class="placa">${v.p}</span></td>
@@ -1046,7 +1192,7 @@ function renderTable(){
       <td class="dim">${v.ano}</td>
       <td class="dim">${kmAtual}</td>
       <td class="dim">${proxRev}</td>
-      <td><span class="${st.cls}">${st.label}</span>${barHtml}${inopHtml}</td>
+      <td><span class="${st.cls}">${st.label}</span>${barHtml}${inopHtml}${shopHtml}</td>
       <td>${v.antt?'<span class="badge b-antt">ANTT</span>':''}</td>
     </tr>`;
   }).join(''):'<tr><td colspan="12" class="no-results">Nenhum veículo encontrado.</td></tr>';
@@ -1070,16 +1216,17 @@ function renderManut(){
     const obsHtml=hasObs?`<span style="font-size:.76rem;color:var(--warn)">${md.obs}</span>`:'<span class="dim">—</span>';
     const kmAlert=getKmAlert(v.f);
     const inop=!!kmAlert;
-    const desde=kmParadoDesde(v.f);
     let ultAtHtml;
-    if(kmAlert){
-      ultAtHtml=`<span class="rev-stopped" title="Parado desde ${fmtDataBR(desde)}">⏸ parado desde ${fmtDataBR(desde)} (${kmAlert.dias}d)</span>`;
-    }else if(desde){
-      ultAtHtml=`<span class="dim">${fmtDataBR(desde)}</span>`;
+    if(kmAlert&&kmAlert.tipo==='sem-comunicacao'){
+      ultAtHtml=`<span class="rev-nodata">📡 SEM COMUNICAÇÃO (${kmAlert.dias}d)</span>`;
+    }else if(kmAlert&&kmAlert.tipo==='parado'){
+      ultAtHtml=`<span class="rev-stopped">⏸ ${md.ultimaLeitura?md.ultimaLeitura+' ':''}(${kmAlert.dias}d)</span>`;
+    }else if(md.ultimaLeitura){
+      ultAtHtml=`<span class="dim">${md.ultimaLeitura}</span>`;
     }else{
       ultAtHtml='<span class="dim">—</span>';
     }
-    return `<tr${inop?' style="background:rgba(139,121,230,.08)"':''}>
+    return `<tr${inop?(kmAlert.tipo==='sem-comunicacao'?' style="background:rgba(224,90,90,.08)"':' style="background:rgba(139,121,230,.08)"'):''}>
       <td>${v.f}</td>
       <td style="font-size:.78rem">${v.m}</td>
       <td class="dim">${fmt(md.plano)}</td>
@@ -1093,6 +1240,125 @@ function renderManut(){
     </tr>`;
   }).filter(Boolean);
   tbody.innerHTML=rows.join('');
+}
+
+// OFICINA / MANUTENÇÃO CORRETIVA
+function ofFrotaKey(fr){
+  if(FROTA.some(v=>v.f===fr)) return fr;
+  if(FROTA.some(v=>v.f===fr+'B')) return fr+'B';
+  if(FROTA.some(v=>v.f===fr+'A')) return fr+'A';
+  return fr;
+}
+function ofRefDate(){
+  const s=MANUT_CORRETIVA.atualizadoEm||'';
+  let d=new Date(s.replace(' ','T'));
+  if(isNaN(d)){
+    const mm=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    if(mm) d=new Date(+mm[3],+mm[2]-1,+mm[1]);
+  }
+  return isNaN(d)?new Date():d;
+}
+function ofDias(entrada){
+  const e=new Date((entrada||'').replace(' ','T'));
+  if(isNaN(e)) return null;
+  return Math.max(0,Math.round((ofRefDate()-e)/86400000));
+}
+function ofFmtData(entrada){
+  const e=new Date((entrada||'').replace(' ','T'));
+  if(isNaN(e)) return entrada||'—';
+  return e.toLocaleDateString('pt-BR');
+}
+const catClass={'Motor':'c-motor','Elétrica':'c-eletrica','Ar-condicionado':'c-ac','Pneus/Alinhamento':'c-pneus','Lanternagem/Pintura':'c-lanternagem','Freios':'c-freios','Outros':'c-outros'};
+function ofSet(){return new Set((MANUT_CORRETIVA.veiculos||[]).map(v=>ofFrotaKey(v.frota)));}
+
+let ofActiveCat='';
+function setOfCat(el,cat){
+  ofActiveCat=cat;
+  document.querySelectorAll('#of-chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderCorretiva();
+}
+
+function renderCorretiva(){
+  const veic=(MANUT_CORRETIVA.veiculos||[]);
+  document.getElementById('oficina-updated').textContent=(MANUT_CORRETIVA.atualizadoEm||'—').replace('T',' ');
+  document.getElementById('oficina-count').textContent=veic.length;
+  const total=veic.length;
+  const cron=veic.filter(v=>{const d=ofDias(v.entrada);return d!=null&&d>30;}).length;
+  const recent=veic.filter(v=>{const d=ofDias(v.entrada);return d!=null&&d<=7;}).length;
+  const motor=veic.filter(v=>v.cat==='Motor').length;
+  const disp=Math.round((FROTA.length-total)/FROTA.length*100);
+  document.getElementById('of-total').textContent=total;
+  document.getElementById('of-cron').textContent=cron;
+  document.getElementById('of-recent').textContent=recent;
+  document.getElementById('of-motor').textContent=motor;
+  document.getElementById('of-disp').textContent=disp+'%';
+  const hist=MANUT_CORRETIVA.historico||[];
+  const maxN=Math.max(1,...hist.map(h=>h.n));
+  document.getElementById('trend-bars').innerHTML=hist.map(h=>`
+    <div class="trend-col">
+      <div class="trend-fill" style="height:${Math.round(h.n/maxN*100)}%"><span>${h.n}</span></div>
+      <div class="trend-day">${h.d}</div>
+    </div>`).join('');
+  const q=(document.getElementById('q-of').value||'').toLowerCase().trim();
+  let rows=veic.filter(v=>{
+    if(ofActiveCat==='cron'){const d=ofDias(v.entrada);if(!(d!=null&&d>30))return false;}
+    else if(ofActiveCat && v.cat!==ofActiveCat) return false;
+    if(!q) return true;
+    const fv=FROTA.find(x=>x.f===ofFrotaKey(v.frota));
+    return v.frota.toLowerCase().includes(q)||(v.problema||'').toLowerCase().includes(q)||
+           (v.apelido||'').toLowerCase().includes(q)||(fv?fv.m.toLowerCase().includes(q):false);
+  });
+  rows.sort((a,b)=>(ofDias(b.entrada)||0)-(ofDias(a.entrada)||0));
+  const tbody=document.getElementById('oficina-tbody');
+  tbody.innerHTML=rows.length?rows.map(v=>{
+    const fv=FROTA.find(x=>x.f===ofFrotaKey(v.frota));
+    const modelo=fv?fv.m:'<span class="dim">—</span>';
+    const d=ofDias(v.entrada);
+    const dCls=d==null?'':d>30?'dias-cron':d>14?'dias-med':'dias-ok';
+    const diasTxt=d==null?'—':d+' dias';
+    const cc=catClass[v.cat]||'c-outros';
+    const nome=v.frota+(v.apelido?' <span class="dim">('+v.apelido+')</span>':'');
+    const pill=(v.status||'INOPERANTE').toUpperCase()==='OPERANTE'?'<span class="status-pill op">OPERANTE</span>':'<span class="status-pill">INOPERANTE</span>';
+    return `<tr>
+      <td>${nome}</td>
+      <td style="font-size:.78rem">${modelo}</td>
+      <td><span class="cat-badge ${cc}">${v.cat||'Outros'}</span></td>
+      <td class="dim">${ofFmtData(v.entrada)}</td>
+      <td><span class="dias-tag ${dCls}">${diasTxt}</span></td>
+      <td class="problema-cell">${v.problema||'—'}</td>
+      <td>${pill}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7" class="no-results">Nenhum veículo na oficina com esse filtro.</td></tr>';
+  document.getElementById('of-count').textContent=`${rows.length} de ${total} veículos inoperantes`;
+}
+
+// Sincronização de data/oficina.json (mesmo mecanismo do KM — ver NOTES.md).
+// Sem quebrar nada se o arquivo ainda não existir no repositório: cai no
+// fallback local (MANUT_CORRETIVA embutido acima) e mostra isso na sync-bar.
+async function syncCorretiva(manual){
+  const dot=document.getElementById('sync-dot-of');
+  const st=document.getElementById('sync-status-of');
+  if(st) st.textContent='sincronizando…';
+  try{
+    const r=await fetch('data/oficina.json',{cache:'no-store'});
+    if(!r.ok) throw {notFound:r.status===404};
+    const data=await r.json();
+    if(data && Array.isArray(data.veiculos)){
+      MANUT_CORRETIVA=data;
+      if(dot) dot.className='sync-dot live';
+      if(st) st.textContent='sincronizado (data/oficina.json)';
+    }else{ throw new Error('JSON inválido'); }
+  }catch(e){
+    if(e&&e.notFound){
+      if(dot) dot.className='sync-dot local';
+      if(st) st.textContent='modo local — data/oficina.json ainda não publicado (dados embutidos)';
+    }else{
+      if(dot) dot.className='sync-dot err';
+      if(st) st.textContent='falha na sincronização — usando dados locais';
+    }
+  }
+  renderCorretiva();
 }
 
 // DRAWER
@@ -1109,17 +1375,29 @@ function openDrawer(frota){
   const kmAlert=getKmAlert(v.f);
   const inop=!!kmAlert;
   const diasTxt=kmAlert?kmAlert.dias+' dia'+(kmAlert.dias===1?'':'s'):'';
-  const desde=kmParadoDesde(v.f);
   let ultLeituraLine='';
-  if(kmAlert){
-    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v rev-stopped">${fmtDataBR(desde)} · sem variar há ${diasTxt}</span></div>`;
-  }else if(desde){
-    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v">${fmtDataBR(desde)}</span></div>`;
+  if(kmAlert&&kmAlert.tipo==='sem-comunicacao'){
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v rev-nodata">Sem dados há ${diasTxt}</span></div>`;
+  }else if(kmAlert&&kmAlert.tipo==='parado'){
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v rev-stopped">${md&&md.ultimaLeitura?md.ultimaLeitura+' · ':''}sem variar há ${diasTxt}</span></div>`;
+  }else if(md&&md.ultimaLeitura){
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v">${md.ultimaLeitura}</span></div>`;
   }
   let inopBox='';
-  if(kmAlert){
-    inopBox=`<div class="obs-box crit">⏸ <strong>Veículo parado:</strong> a quilometragem não muda desde ${fmtDataBR(desde)} (há ${diasTxt}). O sistema está recebendo dados normalmente, mas o valor está congelado — verifique se o veículo está realmente parado ou se o rastreador está travado.</div>`;
+  if(kmAlert&&kmAlert.tipo==='sem-comunicacao'){
+    inopBox=`<div class="obs-box crit">📡 <strong>Sem comunicação:</strong> este veículo não aparece nos dados recebidos há ${diasTxt}. O sistema não está recebendo informação de quilometragem dele — verifique o rastreador ou a automação (n8n).</div>`;
+  }else if(kmAlert&&kmAlert.tipo==='parado'){
+    inopBox=`<div class="obs-box crit">⏸ <strong>Veículo parado:</strong> a quilometragem não muda há ${diasTxt}. O sistema está recebendo dados normalmente, mas o valor está congelado — verifique se o veículo está realmente parado ou se o rastreador está travado.</div>`;
   }
+  const oc=(MANUT_CORRETIVA.veiculos||[]).find(x=>ofFrotaKey(x.frota)===v.f);
+  const ocSection=oc?`
+    <div class="d-section">
+      <div class="d-title">Oficina — corretiva</div>
+      <div class="mi"><span class="mi-l">Situação</span><span class="mi-v" style="color:#F9A09C">INOPERANTE</span></div>
+      <div class="mi"><span class="mi-l">Entrada</span><span class="mi-v">${ofFmtData(oc.entrada)}${ofDias(oc.entrada)!=null?' ('+ofDias(oc.entrada)+' dias)':''}</span></div>
+      <div class="mi"><span class="mi-l">Categoria</span><span class="mi-v">${oc.cat||'—'}</span></div>
+      <div class="obs-box crit">${oc.problema||'—'}</div>
+    </div>`:'';
   const revSection=md?`
     <div class="d-section">
       <div class="d-title">Manutenção Preventiva</div>
@@ -1174,6 +1452,7 @@ function openDrawer(frota){
       </div>
       ${v.motorObs?`<div class="obs-box">⚠ ${v.motorObs}</div>`:''}
     </div>
+    ${ocSection}
     ${revSection}
     <div class="d-section">
       <div class="d-title">Especificação de óleo</div>
