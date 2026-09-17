@@ -53,6 +53,9 @@ ocorrências (O.S.).
   os veículos inoperantes na oficina/corretiva (ver seção 7). Hoje só tem o
   snapshot inicial (seed) — ainda não é atualizado por automação nenhuma.
 - `CNAME` — domínio customizado do GitHub Pages (`frotaws.com`).
+- `manifest.webmanifest` + `icon-192.png` / `icon-512.png` /
+  `apple-touch-icon.png` — arquivos do PWA (atalho na tela inicial do celular),
+  na raiz do repo. Ver seção 9. Os ícones são a logo WS Receptivo em fundo azul.
 - `busca.html`, `menu.html` — páginas auxiliares antigas (não mexidas
   recentemente).
 
@@ -269,7 +272,25 @@ independente, vindo de antes).
   manualmente editando `data/oficina.json` e fazendo upload pelo GitHub.
 - [ ] Nenhuma outra pendência bloqueante de código no momento.
 
-## 9. Como retomar o trabalho numa conversa nova
+## 9. Atalho no celular (PWA / tela inicial)
+
+O painel é instalável como PWA — vira um ícone na tela inicial e abre em tela
+cheia (sem barra do navegador). Implementação:
+
+- `manifest.webmanifest` (raiz): `name`/`short_name` = "Frota WS",
+  `display: standalone`, `start_url`/`scope` = "./", `theme_color` `#08203F`
+  (tema do painel), `background_color` `#284789` (azul da logo), e os ícones
+  `icon-192.png` + `icon-512.png` (`purpose: any maskable`).
+- Ícones: a **logo WS Receptivo em fundo azul** (`#284789`), gerada nos
+  tamanhos 512/192 e `apple-touch-icon.png` (180). Ficam na raiz do repo.
+- No `<head>` do `index.html`: `<link rel="manifest">`, `theme-color`,
+  `apple-touch-icon`, e as metas `apple-mobile-web-app-*` (título "Frota WS").
+- Para instalar: abrir `https://frotaws.com` no celular (logado) →
+  iPhone/Safari: Compartilhar → "Adicionar à Tela de Início"; Android/Chrome:
+  menu → "Adicionar à tela inicial". Sem service worker (não é offline; o
+  painel precisa de rede pra sincronizar os JSON mesmo).
+
+## 10. Como retomar o trabalho numa conversa nova
 
 Basta pedir pra Claude ler este arquivo
 (`raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/PROJETO_PAINEL.md`)
