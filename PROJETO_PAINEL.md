@@ -60,7 +60,7 @@ Dentro do `index.html`, dois blocos `<script>`:
 1. **Script principal** — contém `const FROTA=[...]` (64 veículos, campos:
    `f,p,m,cat,mot,motorSN,motorObs?,cv,cap,ano,emp,antt,chas,renavam,cil,torq,
    euro,cambio,pbt,oleo,interv`), `const MANUT={...}` (por frota: `plano,ulRev,
-   dataRev,kmAtual,proxRev,obs,paradoDesde?`), `const CADASTRO={...}` (por
+   dataRev,kmAtual,proxRev,obs,atualizado?,atualizacao?`), `const CADASTRO={...}` (por
    frota: `plot,cor,prop,crv,fin`), `let MANUT_CORRETIVA={...}` (dados da aba
    Oficina — ver seção 7), e todas as funções de render/lógica.
 2. **Script da aba Ocorrências (O.S.)** — uma IIFE separada com
@@ -106,17 +106,22 @@ direto no repositório GitHub**, atualizando só o arquivo `data/manutencao.json
 
 - Formato do `data/manutencao.json`: array de objetos, um por veículo:
   ```json
-  { "placa": "QLA2804", "kmAtual": 413328, "proxRevisao": 430007, "paradoDesde": "2026-09-17" }
+  { "placa": "QLA2804", "kmAtual": 414992, "proxRevisao": 430007, "atualizado": "nao", "atualizacao": "2026-09-17" }
   ```
-  O campo `paradoDesde` (data ISO `YYYY-MM-DD`) é a fonte **durável** do
-  alerta de "veículo parado" — ver seção 5. **Pendência:** o n8n ainda NÃO
-  está mandando esse campo (2026-09-17); enquanto isso, o app usa um fallback
-  local por navegador. Regra que o n8n deve aplicar para preencher
-  `paradoDesde`: no GET que ele já faz do arquivo (pra pegar o `sha`), comparar
-  o `kmAtual` anterior de cada placa com o novo — se **mudou** (ou placa nova)
-  → `paradoDesde = hoje`; se está **igual** → **manter** o `paradoDesde` que já
-  estava no arquivo. Assim a data representa "desde quando o KM está congelado".
-  (Data no fuso America/Fortaleza: `new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})`.)
+  Além de `kmAtual`/`proxRevisao`, o n8n manda dois campos vindos direto da
+  planilha da telemetria (ver seção 5):
+  - `atualizado`: `"sim"` / `"nao"` — se o KM do veículo foi atualizado na
+    telemetria (coluna "Atualizado" da planilha). O app também aceita
+    `true`/`false`. `nao` → dispara o alerta "sem atualização".
+  - `atualizacao`: data ISO `YYYY-MM-DD` da última leitura (coluna
+    "Atualizacao" da planilha).
+  **Pendência:** o n8n ainda precisa passar a mandar esses dois campos
+  (2026-09-17). Enquanto não vier, nenhum veículo dispara alerta (seguro).
+- Origem: a planilha "WS 2024" da telemetria já tem as colunas PLACA,
+  KM/HR ATUAL, Atualizacao e Atualizado — o n8n lê essa planilha, casa por
+  placa e escreve no JSON. Obs.: antes da sincronização diária da telemetria,
+  a coluna "Atualizado" pode vir toda "NÃO"; depois que ela roda, quem ficar
+  "NÃO" é veículo com problema real de atualização.
 - Mecanismo do n8n: GET no arquivo via GitHub Contents API (pra pegar o
   `sha` atual) → monta o novo JSON → PUT com `sha` + conteúdo em base64 +
   mensagem de commit.
@@ -127,82 +132,72 @@ direto no repositório GitHub**, atualizando só o arquivo `data/manutencao.json
   para de funcionar**.
 - No `index.html`, a função `syncManutencaoData()` faz
   `fetch('data/manutencao.json',{cache:'no-store'})` e mescla os dados no
-  objeto `MANUT` em memória (casando por placa com `FROTA`), incluindo o
-  campo `paradoDesde` quando presente.
+  objeto `MANUT` em memória (casando por placa com `FROTA`), incluindo os
+  campos `atualizado` e `atualizacao` quando presentes.
 - **Atualização em tela**: não existe polling automático (`setInterval` foi
   removido a pedido do usuário, pra não pesar a aba/rede). A atualização
   acontece só quando a aba volta a ficar visível (`visibilitychange` →
   `refreshManutencaoData()`), cobrindo o caso real de uso (KM é atualizado
   uma vez por dia, de madrugada).
 - Status: **automação de KM 100% funcionando e confirmada pelo usuário**. O
-  único ponto aberto é o n8n passar a mandar o novo campo `paradoDesde`.
+  ponto aberto é o n8n passar a mandar os campos `atualizado`/`atualizacao`.
 
-## 5. Alerta de veículo parado
+## 5. Alerta de KM "sem atualização" (telemetria)
 
-Um **único** alerta: se um veículo ficar com o **KM sem mudar por 7 dias ou
-mais**, mostra alerta de **"parado"** (veículo realmente parado, ou rastreador
-travado sempre enviando a mesma leitura).
+Um **único** alerta: se o KM de um veículo **não está sendo atualizado na
+telemetria**, o painel mostra **"sem atualização"**. A fonte é **direta**: o
+flag `atualizado` (sim/nao) que o n8n manda por veículo no
+`data/manutencao.json` (coluna "Atualizado" da planilha da telemetria).
 
-> Histórico: antes existia também um alerta de "sem-comunicação" (placa sumindo
-> do feed) e uma fonte `ultimaLeitura` do rastreador. Ambos foram **removidos**
-> em 2026-09-15 a pedido do usuário — hoje é só o alerta de "parado". Não
-> reintroduzir sem pedir. (Obs.: em 2026-09-15 houve uma colisão de edições
-> paralelas — o upload que adicionou a aba Oficina foi montado sobre uma cópia
-> antiga e reverteu esta mudança; ela foi **reaplicada sobre a versão com
-> Oficina em 2026-09-17**.)
+> Histórico da evolução (não reverter sem pedir):
+> - Antes tinha "sem-comunicação" + "parado" (2 tipos) e a fonte `ultimaLeitura`
+>   — removidos em 2026-09-15 (ficou só "parado").
+> - "parado" era calculado por **7 dias** de KM congelado, com data durável
+>   `paradoDesde` (n8n) + fallback local em `localStorage` — 2026-09-17.
+> - Em 2026-09-17 isso foi **substituído** pelo flag direto `atualizado` da
+>   telemetria (este documento). Sumiram: `DIAS_PARADO_ALERTA`, `paradoDesde`,
+>   `kmParadoDesde`, o histórico local (`kmSince`/`KM_TRACK_KEY`).
 
-Implementado em `index.html` via a função `getKmAlert(f)`, que retorna
-`{tipo:'parado', dias:N}` ou `null`. A **data "parado desde"** (dia em que o
-KM parou de variar) vem de `kmParadoDesde(f)`, que tem duas fontes, nesta
-ordem de preferência:
+Implementado em `index.html`:
+- `kmDesatualizado(f)` → `true` quando `MANUT[f].atualizado` é "nao"/"não"/"n"/
+  `false`/`0` (tolerante). "sim"/`true`/ausente → `false`.
+- `getKmAlert(f)` → `{tipo:'sem-atualizacao'}` quando desatualizado, senão
+  `null`. **Se o campo não vier, não dispara alerta** (seguro).
+- `ultAtualizacao(f)` → data ISO da coluna "Atualizacao" (exibida como DD/MM).
 
-1. **Campo `paradoDesde` do `data/manutencao.json`** (fonte oficial/durável):
-   gravado pelo n8n, vive no arquivo, funciona em qualquer navegador/dispositivo
-   e sobrevive a limpar cache. Usado sempre que presente. **Ainda a implementar
-   no n8n** (ver seção 4).
-2. **Histórico local em `localStorage`** (`KM_TRACK_KEY = 'wsfrota_km_track_v1'`,
-   campo `kmSince`) — **fallback**, usado só enquanto o n8n não manda
-   `paradoDesde`. **Limitação:** é local ao navegador — some se limpar cache
-   ou usar outro dispositivo/navegador, e não tem histórico nos primeiros ~7
-   dias após um deploy novo. Foi essa limitação que motivou o campo durável.
-
-Limiar: **7 dias** (`const DIAS_PARADO_ALERTA = 7`).
+Visual: ícone estilo **"sem sinal de celular"** (SVG inline `ICON_SEMSINAL`,
+mesmo padrão de traço dos outros ícones) + legenda **"sem atualização"**, em
+vermelho (`.rev-nodata`, cor `--critical`).
 
 Onde o alerta aparece:
-- **Inventário** (tabela): selo `⏸ PARADO Xd` (roxo, classe CSS
-  `.rev-stopped`) na coluna Status; o `title` mostra "Parado desde DD/MM…".
-  Filtro dedicado `activeCat==='parados'` usa `getKmAlert()`.
-- **Manutenção Preventiva** (tabela): linha destacada + coluna "Últ.
-  atualização KM" mostrando `⏸ parado desde DD/MM (Xd)`; para veículo normal,
-  mostra a data da última mudança de KM; sem histórico, `—`.
-- **Ficha do veículo (drawer)**: linha "Última atualização de KM" com a data +
-  `.obs-box.crit` explicando "Veículo parado: a quilometragem não muda desde
-  DD/MM (há X dias)".
-- **Indicador no topo** ("Parado 7+ dias", `k-parado`): conta os veículos com
-  alerta. Soma também no contador vermelho geral (`alerta-count`), junto com
-  as revisões vencidas.
-- **`sync-banner`** (topo do Inventário): separado do alerta por veículo —
-  aparece só se o **arquivo inteiro** `data/manutencao.json` falhar ao
-  carregar (rede fora do ar, JSON quebrado, etc.), via `lastSyncFailed` +
-  `updateSyncBanner()`.
+- **Inventário** (tabela): selo `[ícone] SEM ATUALIZAÇÃO` na coluna Status; o
+  `title` mostra "última em DD/MM". Filtro dedicado `activeCat==='parados'`
+  (chave interna mantida) usa `getKmAlert()`.
+- **Manutenção Preventiva** (tabela): linha destacada (fundo vermelho suave) +
+  coluna "Últ. atualização KM" mostrando `[ícone] sem atualização (últ. DD/MM)`;
+  para veículo ok, mostra a data de atualização; sem data, `—`.
+- **Ficha do veículo (drawer)**: linha "Atualização de KM" + `.obs-box.crit`
+  explicando "Sem atualização de KM: a telemetria não está atualizando o KM…".
+- **Indicador no topo** ("Sem atualização", `k-parado`, cor `--critical`):
+  conta os veículos com alerta; soma no contador vermelho geral
+  (`alerta-count`) junto com as revisões vencidas.
+- **`sync-banner`** (topo do Inventário): separado — só aparece se o arquivo
+  inteiro `data/manutencao.json` falhar ao carregar.
 
-Testado (Node.js, mocks): `paradoDesde` com 10 dias → `parado 10` (ignora
-fallback local); com 3 dias → `null`; sem campo, fallback local com 8 dias →
-`parado 8`; sem campo e sem histórico → `null`. `node --check` OK nos dois
-scripts; aba Ocorrências byte-a-byte idêntica. Deploy confirmado no ar em
+Testado (Node.js, mocks): `atualizado` = nao/não/NÃO/false/0 → alerta;
+sim/SIM/true/1/ausente → sem alerta. `node --check` OK nos dois scripts; abas
+Ocorrências e Oficina byte-a-byte intactas. Deploy confirmado no ar em
 2026-09-17.
 
 ## 6. Decisões de design importantes (não reverter sem avisar o usuário)
 
-- **Um único alerta de KM: "parado"** (KM sem variar). O antigo alerta de
-  "sem-comunicação" e a fonte `ultimaLeitura` do rastreador foram removidos —
-  não reintroduzir sem pedido explícito.
-- **Limiar de 7 dias** (`DIAS_PARADO_ALERTA = 7`).
-- **Data "parado desde" durável no `data/manutencao.json`** (campo
-  `paradoDesde`, gerado pelo n8n): o app prefere ela; sem ela, cai no
-  histórico local por navegador (fallback de transição). Motivo: o
-  `localStorage` sozinho é por navegador e some com o cache; a data precisa
-  ficar registrada "no sistema" (no arquivo) pra ser durável e cross-device.
+- **Um único alerta de KM: "sem atualização"**, acionado pelo flag
+  `atualizado` (sim/nao) que a telemetria manda via n8n. Não há mais cálculo
+  por dias, `paradoDesde` nem histórico local — foram removidos. O antigo
+  "sem-comunicação" e a fonte `ultimaLeitura` também não existem mais. Não
+  reintroduzir nada disso sem pedido explícito.
+- **A verdade do alerta vem da telemetria** (arquivo), não de conta no
+  navegador. Se o flag não vier para um veículo, ele não dispara alerta.
 - **Sem polling/`setInterval`**: atualização só por `visibilitychange`.
 - **Ícones/selos em SVG inline, não emoji**, para renderizar igual em qualquer
   tela (ex.: o selo "oficina" no Inventário usa um SVG pequeno + legenda, não
@@ -263,11 +258,11 @@ independente, vindo de antes).
 
 - [ ] **Renovar o GitHub PAT `n8n-frota-km` antes de 2026-09-27** (expira; se
   não renovar, a automação de KM para).
-- [ ] **Implementar no n8n a geração do campo `paradoDesde`** no
-  `data/manutencao.json` (regra na seção 4). O `index.html` já lê o campo e
-  cai no fallback local enquanto ele não vier — então isso pode ser feito a
-  qualquer momento, sem quebrar o painel. Enquanto não for feito, o alerta de
-  "parado" depende do histórico local por navegador (menos confiável).
+- [ ] **Fazer o n8n mandar os campos `atualizado` (sim/nao) e `atualizacao`
+  (data)** no `data/manutencao.json`, lidos da planilha da telemetria (colunas
+  "Atualizado" e "Atualizacao"), casando por placa. O `index.html` já lê esses
+  campos; enquanto não vierem, nenhum veículo dispara o alerta "sem
+  atualização" (comportamento seguro). Ver seções 4 e 5.
 - [ ] Se quiser a aba Oficina realmente automática, configurar o n8n pra
   também escrever `data/oficina.json` (mesmo mecanismo do KM — ver seção 7).
   Até lá, ela funciona com o snapshot embutido/seed, e pode ser atualizada
