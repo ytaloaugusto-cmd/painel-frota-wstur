@@ -19,8 +19,11 @@
 >    relação ao que está de fato no ar.
 > 3. Se o usuário pedir para "salvar"/"anotar" algo sobre o projeto, o lugar
 >    certo é aqui — não apenas responder na conversa.
+> 4. **Só existe UM arquivo de documentação: este (`PROJETO_PAINEL.md`).** O
+>    antigo `NOTES.md` foi removido do repositório em 2026-09-17 por estar
+>    desatualizado e causar confusão. Não recriar.
 
-Última atualização: 2026-09-15
+Última atualização: 2026-09-17
 
 Link direto (sempre a versão mais atual):
 `https://raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/PROJETO_PAINEL.md`
@@ -31,7 +34,8 @@ Link direto (sempre a versão mais atual):
 
 Painel HTML único (`index.html`) de gestão da frota da W2S Locação / S2
 Turismo (Maceió/AL): inventário de veículos, manutenção preventiva (KM x
-revisão), gráficos, referência técnica dos motores e ocorrências (O.S.).
+revisão), oficina (corretiva), gráficos, referência técnica dos motores e
+ocorrências (O.S.).
 
 - Repositório GitHub: `ytaloaugusto-cmd/painel-frota-wstur`, branch `main`.
 - Publicado via **GitHub Pages**.
@@ -43,7 +47,8 @@ revisão), gráficos, referência técnica dos motores e ocorrências (O.S.).
 
 - `index.html` — o painel inteiro (HTML + CSS + JS em 2 blocos `<script>`).
 - `data/manutencao.json` — pequeno arquivo JSON, atualizado automaticamente
-  pelo n8n, com KM atual e próxima revisão de cada veículo (ver seção 4).
+  pelo n8n, com KM atual, próxima revisão e a data "parado desde" de cada
+  veículo (ver seção 4).
 - `data/oficina.json` — pequeno arquivo JSON (mesmo padrão do anterior) com
   os veículos inoperantes na oficina/corretiva (ver seção 7). Hoje só tem o
   snapshot inicial (seed) — ainda não é atualizado por automação nenhuma.
@@ -55,7 +60,7 @@ Dentro do `index.html`, dois blocos `<script>`:
 1. **Script principal** — contém `const FROTA=[...]` (64 veículos, campos:
    `f,p,m,cat,mot,motorSN,motorObs?,cv,cap,ano,emp,antt,chas,renavam,cil,torq,
    euro,cambio,pbt,oleo,interv`), `const MANUT={...}` (por frota: `plano,ulRev,
-   dataRev,kmAtual,proxRev,obs,ultimaLeitura`), `const CADASTRO={...}` (por
+   dataRev,kmAtual,proxRev,obs,paradoDesde?`), `const CADASTRO={...}` (por
    frota: `plot,cor,prop,crv,fin`), `let MANUT_CORRETIVA={...}` (dados da aba
    Oficina — ver seção 7), e todas as funções de render/lógica.
 2. **Script da aba Ocorrências (O.S.)** — uma IIFE separada com
@@ -81,10 +86,17 @@ manual, via interface web do GitHub:
    (não passa pelo Cloudflare Access, então dá pra conferir sem login) e
    checando se os trechos esperados estão lá.
 
-**Detalhe de automação via browser (Claude in Chrome):** o botão "Commit
-changes" às vezes fica com uma referência de elemento "velha" que aponta pro
-lugar errado. Solução que funciona sempre: `scroll_to` no elemento, tirar
-`screenshot`, e clicar pelas coordenadas do pixel em vez de pela referência.
+**Detalhes de automação via browser (Claude in Chrome):**
+- Upload: usar `file_upload` apontando pro input `type=file` da página. O
+  arquivo precisa estar na pasta de **uploads** da sessão (`file_upload` não
+  aceita a pasta de outputs).
+- Botão "Commit changes": às vezes fica com referência de elemento "velha".
+  Solução que funciona sempre: `scroll_to`/`screenshot` e clicar pelas
+  **coordenadas do pixel** em vez de pela referência.
+- Campo de mensagem de commit: clicar bem no centro do campo (borda fica azul)
+  antes de digitar. Se digitar sem foco, o texto vaza pra busca global do
+  GitHub / abre o painel do Copilot — nesse caso apertar `Escape`, reclicar no
+  campo e digitar de novo.
 
 ## 4. Automação de KM via n8n (opção escolhida: "opção 3")
 
@@ -94,10 +106,17 @@ direto no repositório GitHub**, atualizando só o arquivo `data/manutencao.json
 
 - Formato do `data/manutencao.json`: array de objetos, um por veículo:
   ```json
-  { "placa": "QLA2804", "kmAtual": 413328, "proxRevisao": 430007 }
+  { "placa": "QLA2804", "kmAtual": 413328, "proxRevisao": 430007, "paradoDesde": "2026-09-17" }
   ```
-  (campo opcional `ultimaLeitura` também é suportado — ver seção 5 — mas o
-  n8n **ainda não está mandando esse campo** hoje, 2026-09-14).
+  O campo `paradoDesde` (data ISO `YYYY-MM-DD`) é a fonte **durável** do
+  alerta de "veículo parado" — ver seção 5. **Pendência:** o n8n ainda NÃO
+  está mandando esse campo (2026-09-17); enquanto isso, o app usa um fallback
+  local por navegador. Regra que o n8n deve aplicar para preencher
+  `paradoDesde`: no GET que ele já faz do arquivo (pra pegar o `sha`), comparar
+  o `kmAtual` anterior de cada placa com o novo — se **mudou** (ou placa nova)
+  → `paradoDesde = hoje`; se está **igual** → **manter** o `paradoDesde` que já
+  estava no arquivo. Assim a data representa "desde quando o KM está congelado".
+  (Data no fuso America/Fortaleza: `new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})`.)
 - Mecanismo do n8n: GET no arquivo via GitHub Contents API (pra pegar o
   `sha` atual) → monta o novo JSON → PUT com `sha` + conteúdo em base64 +
   mensagem de commit.
@@ -108,87 +127,93 @@ direto no repositório GitHub**, atualizando só o arquivo `data/manutencao.json
   para de funcionar**.
 - No `index.html`, a função `syncManutencaoData()` faz
   `fetch('data/manutencao.json',{cache:'no-store'})` e mescla os dados no
-  objeto `MANUT` em memória (casando por placa com `FROTA`).
-- **Atualização em tela**: não existe mais polling automático
-  (`setInterval` foi removido a pedido do usuário, pra não pesar a aba/rede).
-  A atualização acontece só quando a aba volta a ficar visível
-  (`visibilitychange` → `refreshManutencaoData()`), cobrindo o caso real de
-  uso (KM é atualizado uma vez por dia, de madrugada).
-- Status: **automação 100% funcionando e confirmada pelo usuário** desde
-  antes desta atualização.
+  objeto `MANUT` em memória (casando por placa com `FROTA`), incluindo o
+  campo `paradoDesde` quando presente.
+- **Atualização em tela**: não existe polling automático (`setInterval` foi
+  removido a pedido do usuário, pra não pesar a aba/rede). A atualização
+  acontece só quando a aba volta a ficar visível (`visibilitychange` →
+  `refreshManutencaoData()`), cobrindo o caso real de uso (KM é atualizado
+  uma vez por dia, de madrugada).
+- Status: **automação de KM 100% funcionando e confirmada pelo usuário**. O
+  único ponto aberto é o n8n passar a mandar o novo campo `paradoDesde`.
 
-## 5. Alertas de veículo parado / sem comunicação (funcionalidade mais recente)
+## 5. Alerta de veículo parado
 
-Pedido do usuário: se um veículo ficar **5 dias ou mais** sem atualização de
-KM, mostrar alerta — mas distinguindo dois motivos diferentes:
+Um **único** alerta: se um veículo ficar com o **KM sem mudar por 7 dias ou
+mais**, mostra alerta de **"parado"** (veículo realmente parado, ou rastreador
+travado sempre enviando a mesma leitura).
 
-1. **"sem-comunicacao"** — o veículo simplesmente **para de aparecer** no
-   `data/manutencao.json` (falha do rastreador ou da automação n8n).
-2. **"parado"** — o veículo continua aparecendo normalmente, mas o **valor
-   de KM não muda** por 5+ dias (veículo realmente parado, ou rastreador
-   travado sempre mandando a mesma leitura).
+> Histórico: antes existia também um alerta de "sem-comunicação" (placa sumindo
+> do feed) e uma fonte `ultimaLeitura` do rastreador. Ambos foram **removidos**
+> em 2026-09-15 a pedido do usuário — hoje é só o alerta de "parado". Não
+> reintroduzir sem pedir. (Obs.: em 2026-09-15 houve uma colisão de edições
+> paralelas — o upload que adicionou a aba Oficina foi montado sobre uma cópia
+> antiga e reverteu esta mudança; ela foi **reaplicada sobre a versão com
+> Oficina em 2026-09-17**.)
 
 Implementado em `index.html` via a função `getKmAlert(f)`, que retorna
-`{tipo:'sem-comunicacao'|'parado', dias:N}` ou `null`:
+`{tipo:'parado', dias:N}` ou `null`. A **data "parado desde"** (dia em que o
+KM parou de variar) vem de `kmParadoDesde(f)`, que tem duas fontes, nesta
+ordem de preferência:
 
-- Se `MANUT[f].ultimaLeitura` existir (fonte mais confiável, viria do n8n/
-  rastreador, funciona entre navegadores/dispositivos), usa ela — só detecta
-  o tipo `"parado"` nesse caminho.
-- Se não existir (caso atual, já que o n8n ainda não manda esse campo), usa
-  um **histórico guardado no `localStorage` do navegador**
-  (`KM_TRACK_KEY = 'wsfrota_km_track_v1'`), atualizado a cada sync bem
-  sucedido: `lastSeen` (última vez que a placa apareceu no feed — se sumir,
-  fica congelado, detectando "sem-comunicacao") e `kmSince` (data em que o
-  KM mudou pela última vez — se o valor não mudar, fica congelado,
-  detectando "parado"). **Limitação conhecida:** esse histórico é local ao
-  navegador — some se limpar cache ou usar outro dispositivo/navegador, e
-  não tem histórico nenhum nos primeiros dias após um deploy novo (não vai
-  mostrar alerta até acumular ~5 dias de leituras).
+1. **Campo `paradoDesde` do `data/manutencao.json`** (fonte oficial/durável):
+   gravado pelo n8n, vive no arquivo, funciona em qualquer navegador/dispositivo
+   e sobrevive a limpar cache. Usado sempre que presente. **Ainda a implementar
+   no n8n** (ver seção 4).
+2. **Histórico local em `localStorage`** (`KM_TRACK_KEY = 'wsfrota_km_track_v1'`,
+   campo `kmSince`) — **fallback**, usado só enquanto o n8n não manda
+   `paradoDesde`. **Limitação:** é local ao navegador — some se limpar cache
+   ou usar outro dispositivo/navegador, e não tem histórico nos primeiros ~7
+   dias após um deploy novo. Foi essa limitação que motivou o campo durável.
 
-Onde os alertas aparecem:
-- **Inventário** (tabela): selo `📡 SEM COMUNICAÇÃO Xd` (vermelho, classe CSS
-  `.rev-nodata`) ou `⏸ PARADO Xd` (roxo, classe `.rev-stopped`), coluna
-  Status. Filtro dedicado `activeCat==='parados'` usa `getKmAlert()`.
+Limiar: **7 dias** (`const DIAS_PARADO_ALERTA = 7`).
+
+Onde o alerta aparece:
+- **Inventário** (tabela): selo `⏸ PARADO Xd` (roxo, classe CSS
+  `.rev-stopped`) na coluna Status; o `title` mostra "Parado desde DD/MM…".
+  Filtro dedicado `activeCat==='parados'` usa `getKmAlert()`.
 - **Manutenção Preventiva** (tabela): linha destacada + coluna "Últ.
-  atualização KM" com o mesmo selo/estilo.
-- **Ficha do veículo (drawer)**: linha com data/motivo detalhado +
-  `.obs-box.crit` explicando qual dos dois problemas é.
-- **Indicador no topo** ("Parado 5+ dias", `k-parado`): conta os dois tipos
-  juntos. Soma também no contador vermelho geral (`alerta-count`), junto
-  com as revisões vencidas.
-- **`sync-banner`** (topo do Inventário): separado dos alertas por veículo —
+  atualização KM" mostrando `⏸ parado desde DD/MM (Xd)`; para veículo normal,
+  mostra a data da última mudança de KM; sem histórico, `—`.
+- **Ficha do veículo (drawer)**: linha "Última atualização de KM" com a data +
+  `.obs-box.crit` explicando "Veículo parado: a quilometragem não muda desde
+  DD/MM (há X dias)".
+- **Indicador no topo** ("Parado 7+ dias", `k-parado`): conta os veículos com
+  alerta. Soma também no contador vermelho geral (`alerta-count`), junto com
+  as revisões vencidas.
+- **`sync-banner`** (topo do Inventário): separado do alerta por veículo —
   aparece só se o **arquivo inteiro** `data/manutencao.json` falhar ao
   carregar (rede fora do ar, JSON quebrado, etc.), via `lastSyncFailed` +
-  `updateSyncBanner()`. Mostra a data da última sincronização bem-sucedida
-  (guardada em `localStorage['wsfrota_last_sync_ok']`).
+  `updateSyncBanner()`.
 
-**Quando o n8n futuramente passar a mandar o campo `ultimaLeitura`**, o
-sistema automaticamente vai preferir essa fonte (mais confiável, funciona
-em qualquer dispositivo) em vez do histórico local — não precisa mexer em
-mais nada no `index.html` pra isso, só o n8n começar a mandar o campo.
-
-Testado (Node.js, simulação com `FROTA`/`MANUT`/histórico local mockados):
-leitura antiga via `ultimaLeitura` → `parado`; leitura recente → `null`;
-veículo sumindo do feed → `sem-comunicacao`; KM congelado com veículo
-presente → `parado`; tudo normal ou sem histórico ainda → `null`. Todos os
-casos bateram como esperado.
-
-Deploy desta funcionalidade: **feito e confirmado no ar** em 2026-09-14
-(raw.githubusercontent.com verificado, sem sobras de código antigo
-`diasParado`/`isInoperante`, aba de Ocorrências intacta).
+Testado (Node.js, mocks): `paradoDesde` com 10 dias → `parado 10` (ignora
+fallback local); com 3 dias → `null`; sem campo, fallback local com 8 dias →
+`parado 8`; sem campo e sem histórico → `null`. `node --check` OK nos dois
+scripts; aba Ocorrências byte-a-byte idêntica. Deploy confirmado no ar em
+2026-09-17.
 
 ## 6. Decisões de design importantes (não reverter sem avisar o usuário)
 
-- **Sem polling/`setInterval`**: atualização só por `visibilitychange`
-  (pedido explícito do usuário, pra não pesar a aba/rede — KM só muda 1x/dia
-  de madrugada mesmo).
-- **Alertas de KM parado usam 5 dias** como limiar (`DIAS_PARADO_ALERTA`).
+- **Um único alerta de KM: "parado"** (KM sem variar). O antigo alerta de
+  "sem-comunicação" e a fonte `ultimaLeitura` do rastreador foram removidos —
+  não reintroduzir sem pedido explícito.
+- **Limiar de 7 dias** (`DIAS_PARADO_ALERTA = 7`).
+- **Data "parado desde" durável no `data/manutencao.json`** (campo
+  `paradoDesde`, gerado pelo n8n): o app prefere ela; sem ela, cai no
+  histórico local por navegador (fallback de transição). Motivo: o
+  `localStorage` sozinho é por navegador e some com o cache; a data precisa
+  ficar registrada "no sistema" (no arquivo) pra ser durável e cross-device.
+- **Sem polling/`setInterval`**: atualização só por `visibilitychange`.
+- **Ícones/selos em SVG inline, não emoji**, para renderizar igual em qualquer
+  tela (ex.: o selo "oficina" no Inventário usa um SVG pequeno + legenda, não
+  o emoji 🔧, que variava de tamanho por dispositivo).
 - **Aba Ocorrências (O.S.) é intocável** em qualquer merge relacionado a
   frota/manutenção/KM — é um módulo separado, sempre confirmar que o script
   dela ficou idêntico depois de qualquer edição.
 - **Nunca commitar dados sensíveis** (o token do n8n não deve nunca aparecer
   em nenhum arquivo do repositório — ele fica só configurado dentro do
-  próprio n8n).
+  próprio n8n; por isso a persistência da data NÃO pode ser feita gravando do
+  navegador com token embutido).
 
 ## 7. Aba "Oficina" (manutenção corretiva) — adicionada em 2026-09-15
 
@@ -221,8 +246,10 @@ independente, vindo de antes).
   (data ISO), `cat` (Motor | Elétrica | Ar-condicionado | Pneus/Alinhamento |
   Lanternagem/Pintura | Freios | Outros), `status`, `problema`.
 - Aparece em mais lugares além da própria aba:
-  - **Inventário**: chip de filtro "🔧 Na oficina" + selo `🔧 oficina` na
-    coluna Status da tabela.
+  - **Inventário**: chip de filtro "🔧 Na oficina" + selo "oficina" na coluna
+    Status da tabela. O selo usa um **SVG inline pequeno (10px) + legenda
+    "oficina"** (classe `cat-badge c-motor`), não o emoji 🔧 — mudança de
+    2026-09-17 pra ficar legível/consistente em qualquer tela.
   - **Ficha do veículo (drawer)**: seção "Oficina — corretiva" com situação,
     entrada, categoria e problema relatado, quando o veículo está na lista.
 - KPIs da aba: total inoperante, crônicos (+30 dias), entradas nos últimos 7
@@ -234,10 +261,13 @@ independente, vindo de antes).
 
 ## 8. Pendências / próximos passos conhecidos
 
-- [ ] Renovar o GitHub PAT `n8n-frota-km` antes de **2026-09-27** (expira).
-- [ ] Se possível, pedir pro n8n passar a mandar o campo `ultimaLeitura` no
-  `data/manutencao.json` — melhora a confiabilidade do alerta de "parado"
-  (deixa de depender de histórico local por navegador).
+- [ ] **Renovar o GitHub PAT `n8n-frota-km` antes de 2026-09-27** (expira; se
+  não renovar, a automação de KM para).
+- [ ] **Implementar no n8n a geração do campo `paradoDesde`** no
+  `data/manutencao.json` (regra na seção 4). O `index.html` já lê o campo e
+  cai no fallback local enquanto ele não vier — então isso pode ser feito a
+  qualquer momento, sem quebrar o painel. Enquanto não for feito, o alerta de
+  "parado" depende do histórico local por navegador (menos confiável).
 - [ ] Se quiser a aba Oficina realmente automática, configurar o n8n pra
   também escrever `data/oficina.json` (mesmo mecanismo do KM — ver seção 7).
   Até lá, ela funciona com o snapshot embutido/seed, e pode ser atualizada
