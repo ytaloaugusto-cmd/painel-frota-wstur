@@ -279,16 +279,33 @@ cheia (sem barra do navegador). Implementação:
 
 - `manifest.webmanifest` (raiz): `name`/`short_name` = "Frota WS",
   `display: standalone`, `start_url`/`scope` = "./", `theme_color` `#08203F`
-  (tema do painel), `background_color` `#284789` (azul da logo), e os ícones
-  `icon-192.png` + `icon-512.png` (`purpose: any maskable`).
-- Ícones: a **logo WS Receptivo em fundo azul** (`#284789`), gerada nos
-  tamanhos 512/192 e `apple-touch-icon.png` (180). Ficam na raiz do repo.
-- No `<head>` do `index.html`: `<link rel="manifest">`, `theme-color`,
-  `apple-touch-icon`, e as metas `apple-mobile-web-app-*` (título "Frota WS").
-- Para instalar: abrir `https://frotaws.com` no celular (logado) →
+  (tema do painel), `background_color` `#284789` (azul da logo).
+- Ícone: a **logo WS Receptivo em fundo azul** (`#284789`).
+- **IMPORTANTE — não reverter (senão o ícone volta a falhar no celular):** o
+  site está atrás do **Cloudflare Access** (login), que bloqueava o download
+  do `apple-touch-icon.png`/`manifest` e do próprio ícone — resultado: o
+  atalho vinha genérico e com o nome antigo ("Garagem WS", que é o `<title>`).
+  Solução aplicada (2026-09-17), que faz funcionar SEM mexer no Cloudflare:
+  - Os ícones vão **embutidos como `data:image/png;base64,...` (data URI)** —
+    tanto no `manifest.webmanifest` (icons 192 e 512) quanto no `<head>` do
+    `index.html` (`apple-touch-icon` e `icon`). Assim o navegador não precisa
+    "baixar" o ícone, e o Access não tem o que bloquear.
+  - O `<link rel="manifest">` leva **`crossorigin="use-credentials"`**, pra o
+    manifest ser buscado COM o cookie do Access (senão o Chrome não instala e
+    cai em atalho genérico com o `<title>`).
+  - Os arquivos `icon-192.png`/`icon-512.png`/`apple-touch-icon.png` seguem no
+    repo como reserva, mas o que vale no celular são os data URIs embutidos.
+  - Alternativa (não usada): liberar/deixar público só o manifest+ícones no
+    Cloudflare Zero Trust (Access → Bypass) — só necessária se um dia tirar os
+    data URIs.
+- No `<head>` do `index.html`: `<link rel="manifest" crossorigin="use-credentials">`,
+  `theme-color`, `apple-touch-icon` (data URI), `icon` (data URI) e as metas
+  `apple-mobile-web-app-*` (título "Frota WS").
+- Para instalar: abrir `https://frotaws.com` no celular (logado) e carregar a
+  versão nova (limpar cache do navegador se tiver a antiga) →
   iPhone/Safari: Compartilhar → "Adicionar à Tela de Início"; Android/Chrome:
-  menu → "Adicionar à tela inicial". Sem service worker (não é offline; o
-  painel precisa de rede pra sincronizar os JSON mesmo).
+  menu → "Instalar app" / "Adicionar à tela inicial". Sem service worker (não
+  é offline; o painel precisa de rede pra sincronizar os JSON mesmo).
 
 ## 10. Como retomar o trabalho numa conversa nova
 
