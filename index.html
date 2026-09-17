@@ -96,7 +96,7 @@ table.tbl tr.clickable:hover td{background:var(--surface-2)}
 .rev-warn{color:var(--warn);font-size:.76rem;font-weight:600}
 .rev-crit{color:var(--critical);font-size:.76rem;font-weight:600}
 .rev-none{color:var(--muted);font-size:.76rem}
-.rev-stopped{color:var(--s6);font-size:.76rem;font-weight:700}
+.rev-nodata{color:var(--critical);font-size:.76rem;font-weight:700;display:inline-flex;align-items:center}
 .km-bar{display:inline-block;width:60px;height:6px;border-radius:3px;background:var(--grid);vertical-align:middle;margin-left:4px;position:relative;overflow:hidden}
 .km-bar-fill{height:100%;border-radius:3px;position:absolute;left:0;top:0}
 
@@ -424,7 +424,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
     <div class="kpi" style="--accent:var(--s4)"><div class="k-label">Carros</div><div class="k-val" style="color:var(--s4)" id="k-car">—</div><div class="k-sub">utilitários</div></div>
     <div class="kpi" style="--accent:var(--ws-green)"><div class="k-label">ANTT</div><div class="k-val" style="color:var(--ws-green)" id="k-antt">—</div><div class="k-sub">registrados</div></div>
     <div class="kpi" style="--accent:var(--critical)"><div class="k-label">Rev. vencida</div><div class="k-val" style="color:var(--critical)" id="k-crit">—</div><div class="k-sub">frotas</div></div>
-    <div class="kpi" style="--accent:var(--s6)"><div class="k-label">Parado 7+ dias</div><div class="k-val" style="color:var(--s6)" id="k-parado">—</div><div class="k-sub">KM sem variar</div></div>
+    <div class="kpi" style="--accent:var(--critical)"><div class="k-label">Sem atualização</div><div class="k-val" style="color:var(--critical)" id="k-parado">—</div><div class="k-sub">KM na telemetria</div></div>
   </div>
 
   <h2 class="section">Inventário — clique na frota para ver a ficha técnica</h2>
@@ -444,7 +444,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
       <button class="chip" onclick="setCat(this,'Carro / utilitário')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12L6 7h12l3 5v4H3z"/><circle cx="7.5" cy="16.5" r="1.5"/><circle cx="16.5" cy="16.5" r="1.5"/></svg>Carro</button>
       <button class="chip" onclick="setCat(this,'antt')"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Com ANTT</button>
       <button class="chip" onclick="setCat(this,'alertas')">🔴 Alertas revisão</button>
-      <button class="chip" onclick="setCat(this,'parados')">⏸ Parados 7+ dias</button>
+      <button class="chip" onclick="setCat(this,'parados')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-1px;margin-right:2px"><path d="M4 20v-2M9 20v-5M14 20v-8M19 20v-11"/><path d="M3 4L21 20"/></svg> Sem atualização</button>
       <button class="chip" onclick="setCat(this,'oficina')">🔧 Na oficina</button>
       <button class="chip" onclick="setCat(this,'W2S')">W2S</button>
       <button class="chip" onclick="setCat(this,'S2')">S2</button>
@@ -968,51 +968,18 @@ function getStatus(f){
 }
 
 // ── Alerta de veículo parado ────────────────────────────────────────────
-// Um único tipo de alerta: "parado" — o valor de KM do veículo não muda por
-// DIAS_PARADO_ALERTA dias ou mais (veículo realmente parado, ou rastreador
-// travado sempre enviando a mesma leitura).
-//
-// A DATA "parado desde" (dia em que o KM parou de variar) tem DUAS fontes,
-// nesta ordem de preferência:
-//  1. Campo "paradoDesde" vindo do data/manutencao.json — fonte DURÁVEL:
-//     é gravada pelo n8n (que compara o kmAtual anterior x novo a cada noite),
-//     vive no arquivo, funciona em qualquer navegador/dispositivo e sobrevive
-//     a limpar cache. É a fonte oficial quando presente.
-//  2. Histórico local em localStorage (kmSince) — FALLBACK, usado só enquanto
-//     o n8n ainda não estiver mandando o campo "paradoDesde". Limitação: é por
-//     navegador e some ao limpar cache (por isso é só transição).
-// Assim que o n8n passar a mandar "paradoDesde", o app usa ele automaticamente.
-const DIAS_PARADO_ALERTA = 7;
-const KM_TRACK_KEY = 'wsfrota_km_track_v1';
+// ── Alerta de KM: veículo "sem atualização" na telemetria ────────────────
+// Fonte ÚNICA: o flag "atualizado" (sim/nao) que o n8n manda por veículo no
+// data/manutencao.json, junto com a data "atualizacao" (dia da leitura da
+// telemetria). Se o KM do veículo NÃO está sendo atualizado na telemetria
+// ("atualizado":"nao"), disparamos o alerta. Não há mais cálculo por dias,
+// "paradoDesde" nem histórico local — a verdade vem direto da telemetria.
+// Visual: ícone estilo "sem sinal de celular" (SVG) + legenda "sem atualização".
+const ICON_SEMSINAL='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-right:3px;vertical-align:-1px"><path d="M4 20v-2M9 20v-5M14 20v-8M19 20v-11"/><path d="M3 4L21 20"/></svg>';
 
 function todayISO(){
   const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
-function diasEntre(dataISO,hojeISO){
-  if(!dataISO) return null;
-  const a=new Date(dataISO+'T00:00:00'), b=new Date((hojeISO||todayISO())+'T00:00:00');
-  if(isNaN(a.getTime())||isNaN(b.getTime())) return null;
-  return Math.round((b-a)/86400000);
-}
-function loadKmTrack(){
-  try{ return JSON.parse(localStorage.getItem(KM_TRACK_KEY)||'{}'); }catch(e){ return {}; }
-}
-function saveKmTrack(t){
-  try{ localStorage.setItem(KM_TRACK_KEY,JSON.stringify(t)); }catch(e){}
-}
-
-// Data (ISO) desde quando o KM está congelado no valor atual — ou seja, o dia
-// em que o veículo começou a ficar parado. Preferência: campo "paradoDesde" do
-// n8n (durável, no data/manutencao.json); na falta dele, cai no histórico local
-// (kmSince em localStorage). Ver comentário do bloco acima.
-function kmParadoDesde(f){
-  const md=MANUT[f];
-  if(md && md.paradoDesde) return md.paradoDesde;
-  const v=FROTA.find(x=>x.f===f);
-  if(!v) return null;
-  const rec=loadKmTrack()[(v.p||'').trim().toUpperCase()];
-  return rec&&rec.kmSince?rec.kmSince:null;
 }
 function fmtDataBR(iso){
   if(!iso) return '';
@@ -1020,15 +987,24 @@ function fmtDataBR(iso){
   return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(iso);
 }
 
-// Retorna {tipo:'parado', dias:N} ou null. Usa a data de kmParadoDesde() (campo
-// do n8n quando existir, senão histórico local) e compara com o limite de dias.
+// true se a telemetria NÃO atualizou o KM deste veículo (flag "atualizado" do n8n).
+// Tolerante: aceita "nao"/"não"/"n"/false/0 como "não atualizado".
+function kmDesatualizado(f){
+  const md=MANUT[f];
+  if(!md || md.atualizado==null) return false;
+  if(md.atualizado===false) return true;
+  if(md.atualizado===true) return false;
+  const s=String(md.atualizado).trim().toLowerCase();
+  return s==='nao'||s==='não'||s==='n'||s==='0'||s==='false';
+}
+// Data (ISO) da última atualização de KM na telemetria (coluna "Atualizacao").
+function ultAtualizacao(f){ const md=MANUT[f]; return md&&md.atualizacao?md.atualizacao:null; }
+
+// Retorna {tipo:'sem-atualizacao'} quando o KM não está sendo atualizado; senão null.
 function getKmAlert(f){
   const v=FROTA.find(x=>x.f===f);
-  const md=MANUT[f];
-  if(!v||!md) return null;
-  const dias=diasEntre(kmParadoDesde(f));
-  if(dias!=null && dias>=DIAS_PARADO_ALERTA) return {tipo:'parado',dias};
-  return null;
+  if(!v||!MANUT[f]) return null;
+  return kmDesatualizado(f)?{tipo:'sem-atualizacao'}:null;
 }
 
 function fmt(n){return n!=null?n.toLocaleString('pt-BR'):'—';}
@@ -1042,31 +1018,23 @@ async function syncManutencaoData(){
     const resp=await fetch('data/manutencao.json',{cache:'no-store'});
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     const entries=await resp.json();
-    const hoje=todayISO();
-    const track=loadKmTrack();
     entries.forEach(entry=>{
       const placa=(entry.placa||'').trim().toUpperCase();
       const veic=FROTA.find(v=>(v.p||'').trim().toUpperCase()===placa);
       if(!veic) return;
       const f=veic.f;
-      // "paradoDesde": data durável vinda do n8n (fonte oficial quando presente).
-      const paradoDesde=entry.paradoDesde||null;
+      // Flag da telemetria (n8n): "atualizado" (sim/nao) + "atualizacao" (data).
+      const atualizado=(entry.atualizado!==undefined)?entry.atualizado:null;
+      const atualizacao=entry.atualizacao||null;
       if(MANUT[f]){
         MANUT[f].kmAtual=entry.kmAtual;
         MANUT[f].proxRev=entry.proxRevisao;
-        MANUT[f].paradoDesde=paradoDesde;
+        MANUT[f].atualizado=atualizado;
+        MANUT[f].atualizacao=atualizacao;
       }else{
-        MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:'',paradoDesde:paradoDesde};
+        MANUT[f]={plano:null,ulRev:null,dataRev:'',kmAtual:entry.kmAtual,proxRev:entry.proxRevisao,obs:'',atualizado:atualizado,atualizacao:atualizacao};
       }
-      // Fallback local: guarda a data em que o KM mudou pela última vez (kmSince),
-      // usada só enquanto o n8n ainda não manda "paradoDesde".
-      const anterior=track[placa];
-      track[placa]={
-        km:entry.kmAtual,
-        kmSince:(anterior && anterior.km===entry.kmAtual)?anterior.kmSince:hoje
-      };
     });
-    saveKmTrack(track);
     lastSyncFailed=false;
     return true;
   }catch(err){
@@ -1189,7 +1157,7 @@ function renderTable(){
     }
     const kmAlert=getKmAlert(v.f);
     const inopHtml=kmAlert
-      ?`<span class="rev-stopped" style="margin-left:6px" title="Parado desde ${fmtDataBR(kmParadoDesde(v.f))} — quilometragem sem alteração há ${kmAlert.dias} dias">⏸ PARADO ${kmAlert.dias}d</span>`:'';
+      ?`<span class="rev-nodata" style="margin-left:6px" title="Sem atualização de KM na telemetria${ultAtualizacao(v.f)?` — última em ${fmtDataBR(ultAtualizacao(v.f))}`:''}">${ICON_SEMSINAL}SEM ATUALIZAÇÃO</span>`:'';
     const shopHtml=inShop.has(v.f)?' <span class="cat-badge c-motor" style="margin-left:4px"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24" style="margin-right:3px;flex:none"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>oficina</span>':'';
     return `<tr class="clickable" onclick="openDrawer('${v.f}')">
       <td class="mono">${v.f}</td>
@@ -1226,16 +1194,16 @@ function renderManut(){
     const obsHtml=hasObs?`<span style="font-size:.76rem;color:var(--warn)">${md.obs}</span>`:'<span class="dim">—</span>';
     const kmAlert=getKmAlert(v.f);
     const inop=!!kmAlert;
-    const desde=kmParadoDesde(v.f);
+    const desde=ultAtualizacao(v.f);
     let ultAtHtml;
     if(kmAlert){
-      ultAtHtml=`<span class="rev-stopped" title="Parado desde ${fmtDataBR(desde)}">⏸ parado desde ${fmtDataBR(desde)} (${kmAlert.dias}d)</span>`;
+      ultAtHtml=`<span class="rev-nodata" title="Sem atualização de KM na telemetria">${ICON_SEMSINAL}sem atualização${desde?` (últ. ${fmtDataBR(desde)})`:''}</span>`;
     }else if(desde){
       ultAtHtml=`<span class="dim">${fmtDataBR(desde)}</span>`;
     }else{
       ultAtHtml='<span class="dim">—</span>';
     }
-    return `<tr${inop?' style="background:rgba(139,121,230,.08)"':''}>
+    return `<tr${inop?' style="background:rgba(224,90,90,.08)"':''}>
       <td>${v.f}</td>
       <td style="font-size:.78rem">${v.m}</td>
       <td class="dim">${fmt(md.plano)}</td>
@@ -1383,17 +1351,16 @@ function openDrawer(frota){
   const obsClass=st.label==='VENCIDA'?'obs-box crit':'obs-box';
   const kmAlert=getKmAlert(v.f);
   const inop=!!kmAlert;
-  const diasTxt=kmAlert?kmAlert.dias+' dia'+(kmAlert.dias===1?'':'s'):'';
-  const desde=kmParadoDesde(v.f);
+  const desde=ultAtualizacao(v.f);
   let ultLeituraLine='';
   if(kmAlert){
-    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v rev-stopped">${fmtDataBR(desde)} · sem variar há ${diasTxt}</span></div>`;
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Atualização de KM</span><span class="mi-v rev-nodata">${ICON_SEMSINAL}sem atualização${desde?` · últ. ${fmtDataBR(desde)}`:''}</span></div>`;
   }else if(desde){
-    ultLeituraLine=`<div class="mi"><span class="mi-l">Última atualização de KM</span><span class="mi-v">${fmtDataBR(desde)}</span></div>`;
+    ultLeituraLine=`<div class="mi"><span class="mi-l">Atualização de KM</span><span class="mi-v">${fmtDataBR(desde)}</span></div>`;
   }
   let inopBox='';
   if(kmAlert){
-    inopBox=`<div class="obs-box crit">⏸ <strong>Veículo parado:</strong> a quilometragem não muda desde ${fmtDataBR(desde)} (há ${diasTxt}). O sistema está recebendo dados normalmente, mas o valor está congelado — verifique se o veículo está realmente parado ou se o rastreador está travado.</div>`;
+    inopBox=`<div class="obs-box crit">${ICON_SEMSINAL}<strong>Sem atualização de KM:</strong> a telemetria não está atualizando o KM deste veículo${desde?` (última atualização em ${fmtDataBR(desde)})`:''}. Verifique o rastreador / a comunicação com o sistema de telemetria.</div>`;
   }
   const oc=(MANUT_CORRETIVA.veiculos||[]).find(x=>ofFrotaKey(x.frota)===v.f);
   const ocSection=oc?`
