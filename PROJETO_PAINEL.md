@@ -23,7 +23,7 @@
 >    antigo `NOTES.md` foi removido do repositório em 2026-09-17 por estar
 >    desatualizado e causar confusão. Não recriar.
 
-Última atualização: 2026-09-17
+Última atualização: 2026-09-18
 
 Link direto (sempre a versão mais atual):
 `https://raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/PROJETO_PAINEL.md`
@@ -34,14 +34,22 @@ Link direto (sempre a versão mais atual):
 
 Painel HTML único (`index.html`) de gestão da frota da W2S Locação / S2
 Turismo (Maceió/AL): inventário de veículos, manutenção preventiva (KM x
-revisão), oficina (corretiva), gráficos, referência técnica dos motores e
-ocorrências (O.S.).
+revisão), oficina (corretiva), gráficos, ocorrências (O.S.) e referência
+técnica dos motores.
 
 - Repositório GitHub: `ytaloaugusto-cmd/painel-frota-wstur`, branch `main`.
 - Publicado via **GitHub Pages**.
 - Domínio próprio: **https://frotaws.com** (DNS apontando pro GitHub Pages).
 - Protegido por **Cloudflare Access** (login obrigatório antes de ver o site).
 - Todo o app é client-side: um `index.html` só, sem backend próprio.
+- **Layout (2026-09-18):** redesenhado a partir do `painel_frota_ws_16.html`
+  (enviado pelo usuário) — cores da marca WS (navy/azul/ciano/verde), fontes
+  Barlow, cabeçalho com a logo WS. Abas: **Inventário (Frota), Manutenção
+  Preventiva, Oficina, Gráficos, Ocorrências (O.S.), Ref. Técnica**. Regra do
+  usuário nessa troca: **mudar só o layout, manter todas as funções** — por
+  isso o alerta de KM "sem atualização", o carregamento do KM
+  (`data/manutencao.json`), a aba Oficina, a aba Ocorrências e o PWA foram
+  todos re-encaixados no layout novo.
 
 ## 2. Estrutura de arquivos no repositório
 
@@ -59,16 +67,22 @@ ocorrências (O.S.).
 - `busca.html`, `menu.html` — páginas auxiliares antigas (não mexidas
   recentemente).
 
-Dentro do `index.html`, dois blocos `<script>`:
+O `<head>` carrega o **Chart.js** (cdnjs) — usado só pelos gráficos da aba
+Ocorrências (a aba Gráficos usa barras próprias em CSS, sem Chart.js).
+
+Dentro do `index.html`, dois blocos `<script>` inline:
 1. **Script principal** — contém `const FROTA=[...]` (64 veículos, campos:
    `f,p,m,cat,mot,motorSN,motorObs?,cv,cap,ano,emp,antt,chas,renavam,cil,torq,
    euro,cambio,pbt,oleo,interv`), `const MANUT={...}` (por frota: `plano,ulRev,
    dataRev,kmAtual,proxRev,obs,atualizado?,atualizacao?`), `const CADASTRO={...}` (por
    frota: `plot,cor,prop,crv,fin`), `let MANUT_CORRETIVA={...}` (dados da aba
-   Oficina — ver seção 7), e todas as funções de render/lógica.
-2. **Script da aba Ocorrências (O.S.)** — uma IIFE separada com
-   `const fleet=[...]` e `window.ocRenderCharts`. **Nunca deve ser tocado**
-   em atualizações relacionadas a KM/manutenção — é um módulo independente.
+   Oficina — ver seção 7), `syncManutencaoData()` (carrega o KM do
+   `data/manutencao.json`), o alerta de KM (ver seção 5) e todas as funções
+   de render/lógica.
+2. **Script da aba Ocorrências (O.S.)** — uma IIFE separada com os dados de
+   O.S. e `window.ocRenderCharts` (usa Chart.js). **Nunca deve ser tocado**
+   em atualizações relacionadas a KM/manutenção — é um módulo independente,
+   re-encaixado no layout novo em 2026-09-18 byte-a-byte igual ao anterior.
    (Não confundir com a aba "Oficina", que é outra coisa — ver seção 7.)
 
 ## 3. Como fazer deploy de uma alteração
