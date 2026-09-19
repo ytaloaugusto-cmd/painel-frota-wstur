@@ -23,7 +23,7 @@
 >    antigo `NOTES.md` foi removido do repositório em 2026-09-17 por estar
 >    desatualizado e causar confusão. Não recriar.
 
-Última atualização: 2026-09-18
+Última atualização: 2026-09-19
 
 Link direto (sempre a versão mais atual):
 `https://raw.githubusercontent.com/ytaloaugusto-cmd/painel-frota-wstur/main/PROJETO_PAINEL.md`
@@ -47,9 +47,13 @@ técnica dos motores.
   Barlow, cabeçalho com a logo WS. Abas: **Inventário (Frota), Manutenção
   Preventiva, Oficina, Gráficos, Ocorrências (O.S.), Ref. Técnica**. Regra do
   usuário nessa troca: **mudar só o layout, manter todas as funções** — por
-  isso o alerta de KM "sem atualização", o carregamento do KM
-  (`data/manutencao.json`), a aba Oficina, a aba Ocorrências e o PWA foram
-  todos re-encaixados no layout novo.
+  isso o alerta de KM "sem atualização", a aba Oficina, a aba Ocorrências e o
+  PWA foram todos re-encaixados no layout novo.
+- **Responsividade (2026-09-19):** as tabelas largas (Inventário, Manutenção,
+  Ref. Técnica, Vendidos, Ocorrências) agora **rolam na horizontal** no celular
+  — via `@media(max-width:820px)` deixando os `*-card` com `overflow-x:auto` e
+  as tabelas com `min-width`. Antes os cards tinham `overflow:hidden` e a tabela
+  ficava espremida/cortada, sem como rolar pro lado.
 
 ## 2. Estrutura de arquivos no repositório
 
@@ -115,11 +119,18 @@ manual, via interface web do GitHub:
   GitHub / abre o painel do Copilot — nesse caso apertar `Escape`, reclicar no
   campo e digitar de novo.
 
-## 4. Automação de KM via n8n (opção escolhida: "opção 3")
+## 4. Automação de KM via n8n — REMOVIDA em 2026-09-19
 
-O rastreador/planilha de quilometragem é gerenciado pelo n8n. Em vez de
-mandar e-mail com planilha pra alguém lançar manualmente, o n8n **escreve
-direto no repositório GitHub**, atualizando só o arquivo `data/manutencao.json`.
+> **ATENÇÃO (2026-09-19):** a pedido do usuário, o painel **NÃO lê mais o
+> `data/manutencao.json`**. A função `syncManutencaoData()` foi removida do
+> `index.html`. O painel agora usa **só os dados embutidos** no próprio arquivo
+> (`const MANUT`), inclusive o campo `atualizado` que alimenta o alerta (ver
+> seção 5). **Não reintroduzir esse fetch** sem o usuário pedir. O restante
+> desta seção fica só como registro histórico do que existia.
+
+_(Histórico)_ O rastreador/planilha de quilometragem era gerenciado pelo n8n,
+que escrevia direto no repositório GitHub, atualizando o arquivo
+`data/manutencao.json`. Esse arquivo hoje está vazio (`[]`) e não é usado.
 
 - Formato do `data/manutencao.json`: array de objetos, um por veículo:
   ```json
@@ -162,9 +173,13 @@ direto no repositório GitHub**, atualizando só o arquivo `data/manutencao.json
 ## 5. Alerta de KM "sem atualização" (telemetria)
 
 Um **único** alerta: se o KM de um veículo **não está sendo atualizado na
-telemetria**, o painel mostra **"sem atualização"**. A fonte é **direta**: o
-flag `atualizado` (sim/nao) que o n8n manda por veículo no
-`data/manutencao.json` (coluna "Atualizado" da planilha da telemetria).
+telemetria**, o painel mostra **"sem atualização"**. A fonte é o campo
+`atualizado` (sim/nao) — e a data `atualizacao` — **embutidos no `const MANUT`**
+do próprio `index.html` (desde 2026-09-19; antes vinha do `data/manutencao.json`,
+que foi removido). `atualizado=nao` → alerta. Se o campo não estiver no MANUT,
+não dispara alerta (estado seguro atual — o MANUT embutido ainda não traz esse
+campo, por isso o KPI mostra 0). Para ativar, basta o `atualizado` passar a
+constar nos dados embutidos (ex.: ao regenerar o `index.html`).
 
 > Histórico da evolução (não reverter sem pedir):
 > - Antes tinha "sem-comunicação" + "parado" (2 tipos) e a fonte `ultimaLeitura`
@@ -198,13 +213,15 @@ Onde o alerta aparece:
 - **Indicador no topo** ("Sem atualização", `k-parado`, cor `--critical`):
   conta os veículos com alerta; soma no contador vermelho geral
   (`alerta-count`) junto com as revisões vencidas.
-- **`sync-banner`** (topo do Inventário): separado — só aparece se o arquivo
-  inteiro `data/manutencao.json` falhar ao carregar.
+**Fonte dos dados (2026-09-19):** o painel **NÃO** faz mais fetch de arquivo
+externo. `syncManutencaoData()`, `refreshKmUI()` e o listener de
+`visibilitychange` foram removidos. O KPI "Sem atualização" (`k-parado`) e o
+`alerta-count` são calculados uma vez, no carregamento, a partir do `MANUT`
+embutido (`const semAtualCount=FROTA.filter(v=>getKmAlert(v.f)).length`).
 
 Testado (Node.js, mocks): `atualizado` = nao/não/NÃO/false/0 → alerta;
-sim/SIM/true/1/ausente → sem alerta. `node --check` OK nos dois scripts; abas
-Ocorrências e Oficina byte-a-byte intactas. Deploy confirmado no ar em
-2026-09-17.
+sim/SIM/true/1/ausente → sem alerta. `node --check` OK; abas Ocorrências e
+Oficina byte-a-byte intactas. Deploy confirmado no ar em 2026-09-19.
 
 ## 6. Decisões de design importantes (não reverter sem avisar o usuário)
 
