@@ -917,24 +917,71 @@ function getStatus(f){
   return {label:'OK',cls:'rev-ok',pct:(m.plano-folga)/m.plano*100,folga};
 }
 
-const critCount=FROTA.filter(v=>getStatus(v.f).label==='VENCIDA').length;
-const semAtualCount=FROTA.filter(v=>getKmAlert(v.f)).length;
-document.getElementById('k-crit').textContent=critCount;
-document.getElementById('k-parado').textContent=semAtualCount;
-document.getElementById('alerta-count').textContent=critCount+semAtualCount;
+function refreshKmUI(){
+  const critCount=FROTA.filter(v=>getStatus(v.f).label==='VENCIDA').length;
+  const semAtualCount=FROTA.filter(v=>getKmAlert(v.f)).length;
+  const ec=document.getElementById('k-crit'); if(ec) ec.textContent=critCount;
+  const ep=document.getElementById('k-parado'); if(ep) ep.textContent=semAtualCount;
+  const ea=document.getElementById('alerta-count'); if(ea) ea.textContent=critCount+semAtualCount;
+}
+refreshKmUI();
 
 function fmt(n){return n!=null?n.toLocaleString('pt-BR'):'—';}
 
 // ── KM: alerta "sem atualização" ───────────────────────────────────────────
-// Lê o campo "atualizado" (sim/nao) + a data "atualizacao" que estiverem nos
-// dados embutidos do painel (const MANUT). atualizado=nao → alerta
-// "sem atualização". NÃO depende de arquivo externo (o data/manutencao.json foi
-// removido); o dado vem embutido no próprio index.html.
+// Lê o campo "atualizado" (sim/nao) + a data "atualizacao" de cada veículo.
+// Fonte: data/manutencao.json (gerado pelo n8n), casado por placa; se o arquivo
+// estiver vazio/indisponível, mantém os dados embutidos do MANUT sem quebrar.
+// atualizado=nao → alerta "sem atualização".
 const ICON_SEMSINAL='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex:none;margin-right:3px;vertical-align:-1px"><path d="M4 20v-2M9 20v-5M14 20v-8M19 20v-11"/><path d="M3 4L21 20"/></svg>';
 function fmtDataBR(iso){ if(!iso) return ''; const p=String(iso).split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(iso); }
 function kmDesatualizado(f){ const md=MANUT[f]; if(!md||md.atualizado==null) return false; if(md.atualizado===false) return true; if(md.atualizado===true) return false; const s=String(md.atualizado).trim().toLowerCase(); return s==='nao'||s==='não'||s==='n'||s==='0'||s==='false'; }
 function ultAtualizacao(f){ const md=MANUT[f]; return md&&md.atualizacao?md.atualizacao:null; }
 function getKmAlert(f){ const v=FROTA.find(x=>x.f===f); if(!v||!MANUT[f]) return null; return kmDesatualizado(f)?{tipo:'sem-atualizacao'}:null; }
+
+// ── Leitura do JSON do n8n (data/manutencao.json) ───────────────────────────
+// Estrutura esperada (array por placa):
+//   [{ "placa":"QLA2804", "kmAtual":415200, "proxRevisao":430007,
+//      "atualizado":"SIM"|"NÃO", "atualizacao":"2026-09-17" }, ...]
+// Também aceita o formato "embrulhado" do n8n, em que o array vem como texto
+// dentro de "conteudoArquivo": [{ "conteudoArquivo":"[...]", "quantidadeVeiculos":N }]
+// Casa a placa com a frota (FROTA[].p) e mescla no MANUT. Campos ausentes são
+// preservados. Vazio ([]) ou falha → mantém os dados embutidos.
+const _normPlaca=p=>String(p||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const _PLACA2FROTA=(()=>{const m={};FROTA.forEach(v=>{const k=_normPlaca(v.p);if(k)m[k]=v.f;});return m;})();
+// Desembrulha o formato do n8n ({conteudoArquivo:"<json>"}), se vier assim.
+function _desembrulhaManut(x){
+  try{
+    const w = Array.isArray(x) ? x[0] : x;
+    if(w && typeof w==='object' && w.conteudoArquivo!=null){
+      const inner = typeof w.conteudoArquivo==='string' ? JSON.parse(w.conteudoArquivo) : w.conteudoArquivo;
+      if(Array.isArray(inner)) return inner;
+    }
+  }catch(_){}
+  return x;
+}
+async function syncManutencao(){
+  try{
+    const r=await fetch('data/manutencao.json',{cache:'no-store',credentials:'same-origin'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    let arr=await r.json();
+    arr=_desembrulhaManut(arr);
+    if(!Array.isArray(arr)||arr.length===0){ return; } // vazio → mantém embutido
+    let n=0;
+    arr.forEach(it=>{
+      if(!it) return;
+      const frota=_PLACA2FROTA[_normPlaca(it.placa)];
+      const md=frota&&MANUT[frota];
+      if(!md) return;
+      if(it.kmAtual!=null&&!isNaN(+it.kmAtual))       md.kmAtual=+it.kmAtual;
+      if(it.proxRevisao!=null&&!isNaN(+it.proxRevisao)) md.proxRev=+it.proxRevisao;
+      if(it.atualizado!=null)  md.atualizado=it.atualizado;
+      if(it.atualizacao!=null) md.atualizacao=it.atualizacao;
+      n++;
+    });
+    if(n>0){ refreshKmUI(); if(typeof renderTable==='function') renderTable(); }
+  }catch(e){ /* offline / Cloudflare / arquivo ausente → dados embutidos */ }
+}
 
 // ABAS
 function showTab(id,btn){
@@ -1296,6 +1343,7 @@ function renderBarChart(id,data,max){
 // inicialização da aba oficina (badge + tentativa de sync)
 renderCorretiva();
 syncCorretiva(false);
+syncManutencao();
 </script>
 <script>
 (function(){
