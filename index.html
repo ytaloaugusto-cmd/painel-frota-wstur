@@ -101,6 +101,9 @@ table.tbl td{padding:8px 10px;border-bottom:1px solid var(--grid);vertical-align
 table.tbl tr:last-child td{border-bottom:none}
 table.tbl tr.clickable{cursor:pointer}
 table.tbl tr.clickable:hover td{background:var(--surface-2)}
+/* Cabeçalho fixo da tabela de veículos: rola o corpo por baixo, cabeçalho sempre visível */
+.fleet-card{max-height:72vh;overflow:auto}
+.fleet-card table.tbl thead th{position:sticky;top:0;z-index:3;background:#09213F}
 .mono{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--ws-cyan);font-weight:700}
 .placa{font-family:ui-monospace,monospace;font-size:.76rem;background:var(--surface-2);padding:2px 6px;border-radius:4px;letter-spacing:.08em;border:1px solid var(--grid)}
 .dim{color:var(--muted);font-size:.78rem}
@@ -518,7 +521,7 @@ table.ref-manut td:first-child{color:var(--ink);font-weight:600}
     </div>
   </div>
 
-  <div class="tbl-card">
+  <div class="tbl-card fleet-card">
     <table class="tbl">
       <thead><tr>
         <th>Frota</th><th>Placa</th><th>Modelo</th><th>Categoria</th>
