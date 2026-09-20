@@ -1,308 +1,53 @@
 [
-  {
-    "placa": "QLA2804",
-    "kmAtual": 415619,
-    "proxRevisao": 430007,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLA3654",
-    "kmAtual": 408514,
-    "proxRevisao": 422073,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "TNQ7G21",
-    "kmAtual": 17001,
-    "proxRevisao": 20661,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLM0046",
-    "kmAtual": 334954,
-    "proxRevisao": 337852,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAD5C04",
-    "kmAtual": 48504,
-    "proxRevisao": 64747,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAE9H54",
-    "kmAtual": 78573,
-    "proxRevisao": 94711,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "NML2278",
-    "kmAtual": 540218,
-    "proxRevisao": 558215,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "NMA4755",
-    "kmAtual": 966764,
-    "proxRevisao": 970171,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLL9886",
-    "kmAtual": 259391,
-    "proxRevisao": 264400,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "NMI0278",
-    "kmAtual": 598883,
-    "proxRevisao": 604083,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAD3F04",
-    "kmAtual": 55569,
-    "proxRevisao": 71297,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAD2D24",
-    "kmAtual": 47960,
-    "proxRevisao": 67347,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLM0136",
-    "kmAtual": 336697,
-    "proxRevisao": 344897,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "MUN7648",
-    "kmAtual": 998160,
-    "proxRevisao": 999023,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "TNT0I62",
-    "kmAtual": 13025,
-    "proxRevisao": 32808,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "NMD2991",
-    "kmAtual": 868489,
-    "proxRevisao": 879386,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QWH1694",
-    "kmAtual": 198379,
-    "proxRevisao": 209901,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAF9F60",
-    "kmAtual": 104994,
-    "proxRevisao": 123772,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QWH1654",
-    "kmAtual": 176075,
-    "proxRevisao": 182758,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QWH1684",
-    "kmAtual": 195057,
-    "proxRevisao": 212441,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "OHH2647",
-    "kmAtual": 713215,
-    "proxRevisao": 711933,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAA9F61",
-    "kmAtual": 50417,
-    "proxRevisao": 50009,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAA0D22",
-    "kmAtual": 157467,
-    "proxRevisao": 176848,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "OHG5463",
-    "kmAtual": 719421,
-    "proxRevisao": 733282,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAF9F70",
-    "kmAtual": 63777,
-    "proxRevisao": 76252,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLD4730",
-    "kmAtual": 473997,
-    "proxRevisao": 484887,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLA3664",
-    "kmAtual": 409026,
-    "proxRevisao": 416553,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLL9846",
-    "kmAtual": 331481,
-    "proxRevisao": 337116,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLE6489",
-    "kmAtual": 512218,
-    "proxRevisao": 525816,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLE6499",
-    "kmAtual": 552350,
-    "proxRevisao": 561418,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLG6648",
-    "kmAtual": 539842,
-    "proxRevisao": 550745,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLG6688",
-    "kmAtual": 576954,
-    "proxRevisao": 592361,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QWG4207",
-    "kmAtual": 249964,
-    "proxRevisao": 252533,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLH4597",
-    "kmAtual": 317982,
-    "proxRevisao": 325600,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLF3186",
-    "kmAtual": 319873,
-    "proxRevisao": 324875,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLF3296",
-    "kmAtual": 346080,
-    "proxRevisao": 359710,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLJ4866",
-    "kmAtual": 272287,
-    "proxRevisao": 285216,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLL9866",
-    "kmAtual": 340278,
-    "proxRevisao": 339207,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLL8530",
-    "kmAtual": 264205,
-    "proxRevisao": 284204,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLM2981",
-    "kmAtual": 306788,
-    "proxRevisao": 310142,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLI9485",
-    "kmAtual": 392395,
-    "proxRevisao": 394216,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLJ5397",
-    "kmAtual": 361156,
-    "proxRevisao": 367078,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QLI9475",
-    "kmAtual": 279214,
-    "proxRevisao": 288511,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QTT4691",
-    "kmAtual": 198350,
-    "proxRevisao": 210307,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QWG3260",
-    "kmAtual": 406834,
-    "proxRevisao": 411535,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QWG4177",
-    "kmAtual": 166750,
-    "proxRevisao": 166716,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "QWG4187",
-    "kmAtual": 262686,
-    "proxRevisao": 277965,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAI5H68",
-    "kmAtual": 104185,
-    "proxRevisao": 111329,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "SAI1D18",
-    "kmAtual": 127191,
-    "proxRevisao": 138238,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "TNJ1J49",
-    "kmAtual": 54174,
-    "proxRevisao": 54488,
-    "atualizado": "NÃO"
-  },
-  {
-    "placa": "MUI6F52",
-    "kmAtual": 103802,
-    "proxRevisao": 108971,
-    "atualizado": "NÃO"
-  }
+  {"placa":"QLA2804","kmAtual":415509,"proxRevisao":430007,"atualizado":"SIM"},
+  {"placa":"QLA3654","kmAtual":408514,"proxRevisao":422073,"atualizado":"NÃO"},
+  {"placa":"TNQ7G21","kmAtual":17001,"proxRevisao":20661,"atualizado":"NÃO"},
+  {"placa":"QLM0046","kmAtual":334832,"proxRevisao":337852,"atualizado":"NÃO"},
+  {"placa":"SAD5C04","kmAtual":48504,"proxRevisao":64747,"atualizado":"NÃO"},
+  {"placa":"SAE9H54","kmAtual":78573,"proxRevisao":94711,"atualizado":"NÃO"},
+  {"placa":"NML2278","kmAtual":540218,"proxRevisao":558215,"atualizado":"NÃO"},
+  {"placa":"NMA4755","kmAtual":966764,"proxRevisao":970171,"atualizado":"SIM"},
+  {"placa":"QLL9886","kmAtual":259391,"proxRevisao":264400,"atualizado":"NÃO"},
+  {"placa":"NMI0278","kmAtual":598883,"proxRevisao":604083,"atualizado":"NÃO"},
+  {"placa":"SAD3F04","kmAtual":55569,"proxRevisao":71297,"atualizado":"SIM"},
+  {"placa":"SAD2D24","kmAtual":47960,"proxRevisao":67347,"atualizado":"NÃO"},
+  {"placa":"QLM0136","kmAtual":336597,"proxRevisao":344897,"atualizado":"NÃO"},
+  {"placa":"MUN7648","kmAtual":998160,"proxRevisao":999023,"atualizado":"SIM"},
+  {"placa":"TNT0I62","kmAtual":13025,"proxRevisao":32808,"atualizado":"NÃO"},
+  {"placa":"NMD2991","kmAtual":868489,"proxRevisao":879386,"atualizado":"NÃO"},
+  {"placa":"QWH1694","kmAtual":198379,"proxRevisao":209901,"atualizado":"NÃO"},
+  {"placa":"SAF9F60","kmAtual":104994,"proxRevisao":123772,"atualizado":"SIM"},
+  {"placa":"QWH1654","kmAtual":176075,"proxRevisao":182758,"atualizado":"SIM"},
+  {"placa":"QWH1684","kmAtual":195055,"proxRevisao":212441,"atualizado":"NÃO"},
+  {"placa":"OHH2647","kmAtual":713215,"proxRevisao":711933,"atualizado":"SIM"},
+  {"placa":"SAA9F61","kmAtual":50415,"proxRevisao":50009,"atualizado":"NÃO"},
+  {"placa":"SAA0D22","kmAtual":157467,"proxRevisao":176848,"atualizado":"NÃO"},
+  {"placa":"OHG5463","kmAtual":719421,"proxRevisao":733282,"atualizado":"SIM"},
+  {"placa":"SAF9F70","kmAtual":63777,"proxRevisao":76252,"atualizado":"NÃO"},
+  {"placa":"QLD4730","kmAtual":473997,"proxRevisao":484887,"atualizado":"SIM"},
+  {"placa":"QLA3664","kmAtual":409026,"proxRevisao":416553,"atualizado":"NÃO"},
+  {"placa":"QLL9846","kmAtual":331372,"proxRevisao":337116,"atualizado":"NÃO"},
+  {"placa":"QLE6489","kmAtual":512218,"proxRevisao":525816,"atualizado":"NÃO"},
+  {"placa":"QLE6499","kmAtual":552350,"proxRevisao":561418,"atualizado":"NÃO"},
+  {"placa":"QLG6648","kmAtual":539842,"proxRevisao":550745,"atualizado":"NÃO"},
+  {"placa":"QLG6688","kmAtual":576954,"proxRevisao":592361,"atualizado":"NÃO"},
+  {"placa":"QWG4207","kmAtual":249962,"proxRevisao":252533,"atualizado":"NÃO"},
+  {"placa":"QLH4597","kmAtual":317980,"proxRevisao":325600,"atualizado":"SIM"},
+  {"placa":"QLF3186","kmAtual":319873,"proxRevisao":324875,"atualizado":"NÃO"},
+  {"placa":"QLF3296","kmAtual":346080,"proxRevisao":359710,"atualizado":"NÃO"},
+  {"placa":"QLJ4866","kmAtual":272287,"proxRevisao":285216,"atualizado":"SIM"},
+  {"placa":"QLL9866","kmAtual":340278,"proxRevisao":339207,"atualizado":"NÃO"},
+  {"placa":"QLL8530","kmAtual":264205,"proxRevisao":284204,"atualizado":"NÃO"},
+  {"placa":"QLM2981","kmAtual":306720,"proxRevisao":310142,"atualizado":"SIM"},
+  {"placa":"QLI9485","kmAtual":392395,"proxRevisao":394216,"atualizado":"NÃO"},
+  {"placa":"QLJ5397","kmAtual":361156,"proxRevisao":367078,"atualizado":"SIM"},
+  {"placa":"QLI9475","kmAtual":279214,"proxRevisao":288511,"atualizado":"NÃO"},
+  {"placa":"QTT4691","kmAtual":198350,"proxRevisao":210307,"atualizado":"NÃO"},
+  {"placa":"QWG3260","kmAtual":406834,"proxRevisao":411535,"atualizado":"SIM"},
+  {"placa":"QWG4177","kmAtual":166749,"proxRevisao":166716,"atualizado":"NÃO"},
+  {"placa":"QWG4187","kmAtual":262686,"proxRevisao":277965,"atualizado":"NÃO"},
+  {"placa":"SAI5H68","kmAtual":104185,"proxRevisao":111329,"atualizado":"SIM"},
+  {"placa":"SAI1D18","kmAtual":127191,"proxRevisao":138238,"atualizado":"NÃO"},
+  {"placa":"TNJ1J49","kmAtual":54174,"proxRevisao":54488,"atualizado":"NÃO"},
+  {"placa":"MUI6F52","kmAtual":103715,"proxRevisao":108971,"atualizado":"NÃO"}
 ]
